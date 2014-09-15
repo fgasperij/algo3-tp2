@@ -1,0 +1,57 @@
+\section{Problema 3: La comunidad del anillo}
+
+\subsection{Presentación del problema}
+
+\subsection{Resolución}
+
+\subsection{Demostración}
+
+Nuestro algoritmo encuentra un árbol generador mínimo del grafo de la red de computadoras, y le añade la arista (conexión) más barata de las que quedaron. Afirmamos que ésa es una solución óptima para el problema. Podemos caracterizar toda solución como un grafo conexo con exactamente un circuito simple, siendo el circuito el ``anillo'' y el resto de las aristas las conexiones restantes. Como el grafo es conexo, todas las computadoras estarán conectadas, por lo tanto se cumple con lo pedido.
+
+Veamos entonces que nuestro algoritmo devuelve una solución óptima. Demostraremos ésto por el absurdo, suponiendo que hay una solución estrictamente mejor que la nuestra. Pero primero, necesitamos demostrar el siguiente lema.
+
+\begin{lema}
+\label{lema_ej3}
+Sea $G = (V,X)$ un grafo conexo con exactamente un circuito simple $C$. Sea $e$ una arista tal que $e \in C$. Sea $X' = X - \left\{e\right\}$. Entonces $G' = (V,X')$ es un árbol generador de $G$.
+\end{lema}
+\begin{proof}
+Supongamos que $G' = (V,X')$ no es un árbol generador de $G$. Esto es, $G'$ no es generador de $G$, o no es árbol. \\
+Si no fuera generador, entonces no tendría los mismos nodos que $G$, lo cual es absurdo porque $G = (V,X)$ y $G' = (V,X')$.
+Entonces $G'$ no debe ser árbol. Esto es, o $G'$ no es conexo, o tiene al menos un circuito simple. \\
+Si $G'$ no fuera conexo, entonces existen vértices $v$, $w$ en $V$ tales que no existe un camino simple entre ellos. Sabemos que $G$ es conexo, entonces sea $C_{v,w}$ el camino simple entre $v$ y $w$ partiendo desde $v$. Hay dos posibilidades: $e \in C_{v,w}$ ó $e \notin C_{v,w}$. 
+\begin{itemize}
+\item Si $e \notin C_{v,w}$, entonces $C_{v,w} \subseteq X'$ y por lo tanto el camino está en $G'$. 
+\item Si $e \in C_{v,w}$, entonces $C_{v,w} \not\subseteq X'$, pero como $e \in C$, es decir, $e$ está en el circuito simple de $G$, si $e = (a,b)$ donde $a, b \in V$, entonces existen dos caminos entre $a$ y $b$, a saber: ir por $e$ ó ir por $C - \left\{e\right\}$. Podemos escribir $C_{v,w} = C_{v,a} \oplus (a,b) \oplus C_{b,w}$ donde $C_{v,a}$ y $C_{b,w}$ son los subcaminos entre $v$,$a$ y $b$,$w$ respectivamente, y además $e \notin C_{v,a}$, $e \notin C_{b,w}$ porque $C_{v,w}$ es camino simple. El camino $C'_{v,w} = C_{v,a} \oplus (C - \left\{e\right\}) \oplus C_{b,w}$ es un camino entre $v$ y $w$ tal que $C'_{v,w} \subseteq X'$, y por lo tanto hay un camino simple entre $v$ y $w$ en $G'$ (si $C'_{v,w}$ no fuera simple, siempre podemos quitar los circuitos que se generan al pasar por un mismo nodo, quedando de esa forma un camino simple).
+\end{itemize}
+Luego, $G'$ es conexo. Entonces $G'$ debe tener al menos un circuito simple $C'$, y $e \notin C'$ porque $e \notin X'$. Pero esto implica que $G$ tiene dos circuitos simples distintos porque $C' \subseteq X' \subseteq X$, y $C' \neq C$ pues $e \in C$, lo cual es absurdo porque por hipótesis $G$ tiene exactamente un circuito simple. El absurdo provino de suponer que $G'$ no es árbol generador de $G$. \\ Por lo tanto, $G'$ es un árbol generador de $G$.
+\end{proof}
+
+\begin{notacion}
+Dado un grafo cualquiera $G = (V,X)$ con $x \in X$, 
+\begin{align*}
+G - \left\{x\right\} = (V, X - \left\{x\right\})
+\end{align*}
+\end{notacion}
+
+\begin{correctidud}
+Sea $G = (V,X_G)$ el grafo de la red de computadoras, donde cada nodo es una computadora, y cada arista es una conexión. Sea $S = (V,X)$ subgrafo de $G$, la solución construida por nuestro algoritmo, esto es: $T = (V, X_T)$ un árbol generador mínimo de $G$, más agregar la arista $e \in \left\{x \in X_G - X_T \mid l(x) \leq l(x') \; \forall x' \in X_G - X_T \right\}$, esto es, $X = X_T \cup \left\{e\right\}$. $S$ es un grafo conexo con exactamente un circuito simple $C$ tal que $e \in C$, por definición equivalente de árbol. Entonces, no existe $S' = (V,X')$ subgrafo de $G$ conexo con exactamente un circuito simple, tal que $costo(S) > costo(S')$, siendo para cualquier grafo $G = (V,X)$
+\begin{align*}
+costo(G) = \sum\limits_{\substack{x \in X}} l(x)
+\end{align*}
+\end{correctidud}
+\begin{proof}
+Supongamos que hay una solución mejor $S'$, esto es, $costo(S) > costo(S')$. \\
+\noindent Sea $e'$ cualquier arista del circuito de $S'$. Entonces,
+\begin{align*}
+costo(S - \left\{e\right\}) \leq costo(S' - \left\{e'\right\})
+\end{align*}
+Esto es así porque $S - \left\{e\right\}$ es árbol generador mínimo y $S'$ sin una arista de su circuito es un árbol generador por el Lema \ref{lema_ej3}. \\
+Entonces, para toda arista $e'$ del circuito de $S'$, vale que $l(e') < l(e)$, de lo contrario sería $costo(S) \leq costo(S')$, absurdo.
+Además, cada arista del circuito de $S'$ debe estar en $S - \left\{e\right\}$, porque si no, el algoritmo no hubiera elegido a $e$ como arista final, habiendo una de menor costo. \\
+Por lo tanto, el circuito de $S'$ está en $S - \left\{e\right\}$. Pero entonces $S - \left\{e\right\}$ tiene un circuito siendo un árbol, absurdo. El absurdo provino de suponer que hay una solución mejor que la construida por nuestro algoritmo. \\
+Luego, la solución devuelta por nuestro algoritmo es óptima, y el algoritmo es correcto.
+\end{proof}
+
+\subsection{Análisis de complejidad}
+
+\subsection{Tests de complejidad}
