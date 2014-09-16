@@ -1,3 +1,9 @@
+# Latex OH
+*.aux
+*.toc
+*.log
+*.gz
+
 # Compiled Object files
 *.slo
 *.lo
@@ -26,3 +32,5 @@
 *.exe
 *.out
 *.app
+
+Informe.pdf
