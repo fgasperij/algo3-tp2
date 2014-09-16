@@ -24,7 +24,7 @@ int * tablaProximoVueloOptimo = NULL; // Dice para el ID de cada vuelo, cuál se
 map< string, list<Vuelo> > vuelosSalientesPorCiudad; // Crear este diccionario lleva en el peor caso O(n*log(n)) + O(m). Como en el peor caso, hay el doble de ciudades que de vuelos, esto es O(m*log(m)) + O(m) = O(m*log(m)) que no es peor que O(m²)
 
 // Esta función devuelve la hora más temprana a la que puedo llegar a la ciudad B tomándome el vuelo "v", o INT_MAX si no es posible llegar.
-int mejorHoraAterrizajeACiudadDestinoSiMeTomoElVuelo(const Vuelo & v) {
+int mejorHoraAterrizajeACiudadBSiMeTomoElVuelo(const Vuelo & v) {
     // Si ya lo había calculado, listo
     if (tablaHoraOptima[v.ID] != -1) {
         return tablaHoraOptima[v.ID];
@@ -38,7 +38,7 @@ int mejorHoraAterrizajeACiudadDestinoSiMeTomoElVuelo(const Vuelo & v) {
         for (auto it = v.vuelosDeCiudadDestino->begin(); it != v.vuelosDeCiudadDestino->end(); it++) {
             // Primero tengo que chequear si el vuelo me lo puedo tomar, esto es, si estoy al menos dos horas antes
             if (v.horaAterrizaje <= it->horaDespegue - 2) {
-                if (mejorHoraAterrizajeACiudadDestinoSiMeTomoElVuelo(*it) < horaOptimaAterrizajeEnCiudadB) {
+                if (mejorHoraAterrizajeACiudadBSiMeTomoElVuelo(*it) < horaOptimaAterrizajeEnCiudadB) {
                     // Este vuelo llega antes que los que había calculado hasta ahora
                     horaOptimaAterrizajeEnCiudadB = tablaHoraOptima[it->ID];
                     vueloOptimoParaLlegarACiudadB = it->ID;
@@ -79,7 +79,7 @@ int main(int argc, const char* argv[]) {
     int vueloOptimoParaLlegarACiudadB = -1;
     list<Vuelo> * vuelosDeCiudadA = & vuelosSalientesPorCiudad[ciudadA];
     for (auto it = vuelosDeCiudadA->begin(); it != vuelosDeCiudadA->end(); it++) {
-        if (mejorHoraAterrizajeACiudadDestinoSiMeTomoElVuelo(*it) < horaOptimaAterrizajeEnCiudadB) {
+        if (mejorHoraAterrizajeACiudadBSiMeTomoElVuelo(*it) < horaOptimaAterrizajeEnCiudadB) {
             horaOptimaAterrizajeEnCiudadB = tablaHoraOptima[it->ID];
             vueloOptimoParaLlegarACiudadB = it->ID;
         }
