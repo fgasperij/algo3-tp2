@@ -160,7 +160,7 @@ int main(int argc, const char* argv[]) {
     verticeVisitado[primero] = true;
     aristaAnterior[segundo] = menor;
     
-    hallarCircuito(aristasDeCadaVerticeAGM, verticeVisitado, verticeAnterior, segundo, primero, aristaAnterior); // costo O(m) = O(n²) en el peor caso
+    hallarCircuito(aristasDeCadaVerticeAGM, verticeVisitado, verticeAnterior, segundo, primero, aristaAnterior); // costo O(m) = O(n) porque el grafo solución tiene n aristas (el AGM tiene m = n - 1, +1 arista agregada).
     
     Vertice actual = primero;
     do {
