@@ -13,6 +13,35 @@ Es por eso que se nos pide el mejor itinerario, teniendo al menos dos horas entr
 Adem\'as se nos pide que la resoluci\'on de este problema se implemente en un complejidad no peor a O($N^{2}$) donde N es la cantidad de vuelos totales que existen en todo el sistema (formen parte del itinerario o no).
 \subsection{Resolución}
 
+Sea Ciudad un renombre de String.
+
+Sea Vuelo una tupla $<$despegue:Nat, aterrizaje:Nat, origen:Ciudad, destino:Ciudad$>$
+
+Dado $vuelos$:Conj(Vuelo):
+
+Llamemos a $ciudadades$:Conj(Ciudad) al conjunto tal que:
+
+($\forall$ $c$:Ciudad, $c$ $\in$ $ciudades$)  $\Leftrightarrow$ ($\exists$ $v$:Vuelo, $v$ $\in$ $vuelos$ $\wedge$ ($v$.origen $\equiv$ $c$ $\vee$ $v$.destino $\equiv$ $c$))
+
+Dadas $a,b$:Ciudad, $a,b \in ciudades$. 
+
+Sea el enunciado:
+
+esItinerarioValido(Sec$<$Vuelo$>$ $S$, Ciudad a, Ciudad b) $\equiv$
+
+ 
+$S_{0}$.origen $\equiv a \wedge S_{S.tamanio-1)}$.destino$ \equiv b \wedge$ 
+
+($\forall$ $i$:Nat, 0 $<$ i $<S.tamanio$)($S_{i}$.destino $\equiv$ $S_{i+1}$.origen $\wedge$ $S_{i}$.aterrizaje + 2 $\leq$ $S_{i+1}$.despegue))
+
+Se nos pide encontrar $S$:Sec$<$Vuelo$>$ tal que 
+
+esItinerarioValido($S$,a,b) $\wedge$ 
+
+$(\forall$ $S'$:Sec$<$Vuelo$>$ $/$ esItinerarioValido($S'$,a,b) $\implies$  
+
+$S_{S.tamanio-1}$.aterrizaje$) \leq S'_{S'.tamanio-1}$.aterrizaje))
+
 \subsection{Demostración}
 
 \subsection{Análisis de complejidad}
