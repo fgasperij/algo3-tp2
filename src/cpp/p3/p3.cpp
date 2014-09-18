@@ -9,13 +9,10 @@ typedef int Vertice;
 
 class Arista {
     private:
-        //int ID;
         Vertice v1;
         Vertice v2;
         int l;
     public:
-        //Arista() : ID(-1), v1(-1), v2(-1), l(-1){}
-        //Arista(const int & ID, const Vertice & v1, const Vertice & v2, const int & l) : ID(ID), v1(v1), v2(v2), l(l){}
         Arista() : v1(-1), v2(-1), l(-1){}
         Arista(const Vertice & v1, const Vertice & v2, const int & l) : v1(v1), v2(v2), l(l){}
         int costo() const {
@@ -28,7 +25,6 @@ class Arista {
             pair<bool,Vertice> res;
             int incideEnV1 = conjVertices.count(v1);            // set::count() es O(log |conj|)
             int incideEnV2 = conjVertices.count(v2);
-            //cout << "inc " << incideEnV1 << " " << incideEnV2 << endl;
             if (incideEnV1 + incideEnV2 == 2) {
                 res.first = true;
             } else {
@@ -49,16 +45,13 @@ class Arista {
         Vertice dameElOtroVertice(Vertice v) const {            // Requiere que (v == v1) ó (v == v2)
             return (v == v1) ? v2 : v1;
         }
-        //int getID() const {
-            //return ID;
-        //}
 };
 
-struct comparacionCosto {
+struct comparacionArista {
     bool operator() (const Arista & lhs, const Arista & rhs) const {
         // Quiero que:
-        // Si tienen = costo entonces return ID1 < ID2
-        // Si tiene !=costo entonces return COSTO1 < COSTO2
+        // Si tienen = costo, ordene por costo
+        // Si tienen != costo, ordene por vértices (excepto el caso particular en que sean e = (a,b,c), e' = (b,a,c); entonces e = e')
         if (lhs.costo() == rhs.costo()) { // (x1,y1,c), (x2,y2,c)
             if( lhs.dameVerticeUno() == rhs.dameVerticeUno() ) { // (a,y1,c), (a,y2,c)
                 return lhs.dameVerticeDos() < rhs.dameVerticeDos();
@@ -69,7 +62,6 @@ struct comparacionCosto {
                     return lhs.dameVerticeUno() < rhs.dameVerticeUno();
                 }
             }
-            //return lhs.getID() < rhs.getID();
         } else {
             return lhs.costo() < rhs.costo();
         }
@@ -82,10 +74,10 @@ int main(int argc, const char* argv[]) {
     unsigned int n, m, costoTotal = 0;                          // n = #vertices, m = #aristas
     vector< list<Arista> > aristasDeCadaVertice;                // aristasDeCadaVertice[i] es la lista de las aristas del vértice i
     vector< list<Arista> > aristasDeCadaVerticeAGM;
-    set<Arista, comparacionCosto> aristasGrafo;
+    set<Arista, comparacionArista> aristasGrafo;
     set<Vertice> verticesAGM;                                   // conjunto con los vertices ya puestos en el AGM parcial
-    set<Arista, comparacionCosto> aristasAGM;                   // conjunto con las aristas ya puestas en el AGM parcial
-    set<Arista, comparacionCosto> aristasCandidatasAGM;         // conjunto de las aristas candidatas para el AGM en un momento dado
+    set<Arista, comparacionArista> aristasAGM;                  // conjunto con las aristas ya puestas en el AGM parcial
+    set<Arista, comparacionArista> aristasCandidatasAGM;        // conjunto de las aristas candidatas para el AGM en un momento dado
     list<Arista> aristasAnillo;
     
     cin >> n >> m;
@@ -104,12 +96,11 @@ int main(int argc, const char* argv[]) {
         Vertice v1, v2;
         int l;
         cin >> v1 >> v2 >> l;
-        v1--; v2--;                                             // Como los equipos van de 1 a n, resto uno para que v1 y v2 vayan de 0 a n-1. Al devolver la solución sumo 1 y listo
-        //Arista a(i, v1, v2, l);
+        v1--; v2--; // Como los equipos van de 1 a n, resto uno para que v1 y v2 vayan de 0 a n-1. Al devolver la solución sumo 1 y listo
         Arista a(v1, v2, l);
         aristasDeCadaVertice[v1].push_back(a);
         aristasDeCadaVertice[v2].push_back(a);
-        aristasGrafo.insert(a);
+        aristasGrafo.insert(a); // costo total O(m log m) que en el peor caso es O(n²log n²) = O(n² log n) porque log(n²) = 2 log(n)
     }
     
     // Arranco poniendo el vértice 0 en verticesAGM, y sus aristas en aristasCandidatasAGM
@@ -118,25 +109,26 @@ int main(int argc, const char* argv[]) {
         aristasCandidatasAGM.insert(*it);
     }
     
+    // El costo total de hacer este ciclo es O(n² log n) porque se consideran todas las aristas, entonces insertarlas todas en el conjunto aristasCandidatasAGM cuesta c*(1+2+...+m) = O(log m!) = O(m log m) = O(n² log n²) = O(n² log n) en el peor caso (m = n(n-1) = O(n²)). Sacando estas inserciones, para cada arista se hacen O(log n) operaciones, entonces el costo total de esto es O(m log n) = O(n² log n) en el peor caso.
     while (aristasAGM.size() < n - 1 && aristasCandidatasAGM.size() > 0 ) { // set::size() es O(1)
         auto iterAristaMinima = aristasCandidatasAGM.begin();
         Arista a = *iterAristaMinima;
         aristasCandidatasAGM.erase(iterAristaMinima);           // Saco la arista del pool de candidatas, costo amortizado constante
-        pair<bool,Vertice> infoIncidencia = a.incideEnDosVertices(verticesAGM);
+        pair<bool,Vertice> infoIncidencia = a.incideEnDosVertices(verticesAGM); // costo O(log |V(T)|)
         if (infoIncidencia.first) {                             // Si incide en 2 vertices, no la puedo usar
             continue;
         } else {
             Vertice nuevo = infoIncidencia.second;              // Este es el vértice en el que no incide, no está en AGM
-            verticesAGM.insert(nuevo);
-            aristasGrafo.erase(a);                              // Saco del grafo la arista que voy a poner en el AGM
-            aristasAGM.insert(a);
+            verticesAGM.insert(nuevo);                          // costo O(log |V(T)|)
+            aristasGrafo.erase(a);                              // Saco del grafo la arista que voy a poner en el AGM, costo amort. cte.
+            aristasAGM.insert(a);                               // costo O(log |V(T)|) porque un árbol tiene m = n - 1
             Vertice otro = a.dameElOtroVertice(nuevo);
-            aristasDeCadaVerticeAGM[nuevo].push_back(a);
+            aristasDeCadaVerticeAGM[nuevo].push_back(a);        // costo O(1)
             aristasDeCadaVerticeAGM[otro].push_back(a);
             for(auto it = aristasDeCadaVertice[nuevo].begin(); it != aristasDeCadaVertice[nuevo].end(); it++) {
-                //if (it->incideEnDosVertices(verticesAGM).first) {
-                    //continue;                                   // Si estoy acá, iba a agregar una arista repetida (hay 2m en total)
-                //}
+                if (it->incideEnDosVertices(verticesAGM).first) {
+                    continue;                                   // Si estoy acá, iba a agregar una arista repetida o ya considerada
+                }
                 aristasCandidatasAGM.insert(*it);
             }
         }
@@ -157,8 +149,8 @@ int main(int argc, const char* argv[]) {
     for (auto it = aristasAGM.begin(); it != aristasAGM.end(); it++) {
         costoTotal += it->costo();
     }
-    Vertice primero = menor.dameVertices().first;
-    Vertice segundo = menor.dameVertices().second;
+    Vertice primero = menor.dameVerticeUno();
+    Vertice segundo = menor.dameVerticeDos();
     aristasDeCadaVerticeAGM[primero].push_back(menor);
     aristasDeCadaVerticeAGM[segundo].push_back(menor);
     // Tengo que encontrar el circuito simple, esto es, el anillo
@@ -168,7 +160,7 @@ int main(int argc, const char* argv[]) {
     verticeVisitado[primero] = true;
     aristaAnterior[segundo] = menor;
     
-    hallarCircuito(aristasDeCadaVerticeAGM, verticeVisitado, verticeAnterior, segundo, primero, aristaAnterior);
+    hallarCircuito(aristasDeCadaVerticeAGM, verticeVisitado, verticeAnterior, segundo, primero, aristaAnterior); // costo O(m) = O(n²) en el peor caso
     
     Vertice actual = primero;
     do {
