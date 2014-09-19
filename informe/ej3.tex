@@ -2,7 +2,41 @@
 
 \subsection{Presentación del problema}
 
+Dado un conjunto de computadoras, y un conjunto de enlaces entre pares de ellas (con a lo sumo un enlace para cada par), los cuales tienen un costo asociado, se pide elegir un conjunto de ellos tales que haya una red en forma ``anillo'', y que todas las computadoras tengan acceso a éste anillo usando enlaces de manera directa o indirecta (es decir, no es necesario que tengan un enlace a una computadora del anillo, sino que pueden tenerlo con una computadora intermedia), de manera de minimizar el costo total de los enlaces elegidos. Veamos por ejemplo las siguientes dos figuras:
+
+\begin{figure}[ht]
+	\begin{minipage}[t]{0.5\linewidth}
+		\centering
+		\includegraphics[width=\textwidth]{ej3_ejemplo.png}
+		\caption{Red original}
+		\label{fig:ej3_ejemplo}
+	\end{minipage}
+	\begin{minipage}[t]{0.5\linewidth}
+		\centering
+		\includegraphics[width=\textwidth]{ej3_ejemplo_solucion_optima.png}
+		\caption{Una solución óptima}
+		\label{fig:ej3_ejemplo_solucion_optima}
+	\end{minipage}
+\end{figure}
+
+En la Figura \ref{fig:ej3_ejemplo} vemos una red de seis computadoras con sus enlaces y sus costos asociados, y en la Figura \ref{fig:ej3_ejemplo_solucion_optima} tenemos una solución óptima del problema, con el anillo de equipos remarcado.
+
 \subsection{Resolución}
+
+Primero necesitamos caracterizar al conjunto de soluciones del problema. Como a lo sumo hay un enlace entre dos máquinas, podemos pensar a éstas como vértices, y a los enlaces como aristas. Entonces, tenemos como input un grafo $G = (V,X)$, y una solución (si existe) será un subgrafo de $G$ con las siguientes características:
+\begin{enumerate}
+    \item Debe ser \textbf{conexo}, porque si no lo fuera, eso implica que hay alguna máquina que no puede conectarse con el anillo.
+    \item Debe tener un \textbf{circuito simple}, éste será el anillo. Si no puede contruirse, no habrá solución.
+    \item Más aún, debe tener \textbf{exactamente un circuito simple}. El problema no prohíbe que haya más de uno, pero si tuviéramos más de un ciclo, bastaría con quitar la arista más costosa que forme parte de algún circuito, para mejorar la solución, ya que el subgrafo seguiría siendo conexo (los caminos simples que pasaran por la arista que quitamos, podrían desviarse por el resto del circuito, ver $Correctitud$) y seguiría existiendo al menos un circuito simple (si la arista no forma parte de dos circuitos, listo, porque queda el otro intacto; si es parte de dos circuitos, entonces hay un circuito que no la toca \textbf{JUSTIFICAR MEJOR}). Este procedimiento lo podríamos repetir hasta que sólo quede un circuito. Luego, podemos descartar todos los subgrafos con más de un circuito simple, ya que son soluciones necesariamente subóptimas.
+\end{enumerate}
+Tenemos entonces caracterizada a una solución como un subgrafo de $G$ conexo y con exactamente un circuito simple. Una solución óptima entonces será minimizar el costo de este tipo de subgrafos. Vamos a construir una solución óptima en dos pasos:
+\begin{enumerate}
+ \item Hallaremos $T = (V, X_T)$ un árbol generador mínimo de $G$ (si no existe, no hay solución).
+ \item Tomaremos la arista $e$ de mínimo costo en $X - X_T$ (si el conjunto es vacío, no hay solución) y la agregaremos a $T$.
+\end{enumerate}
+Nuestro algoritmo construirá entonces el subgrafo $S = (V, X_T \cup \left\{e\right\})$. En la demostración de correctitud veremos que efectivamente $S$ es una solución óptima del problema.
+
+\textbf{COMPLETAR}
 
 \subsection{Demostración}
 
@@ -33,12 +67,12 @@ G - \left\{x\right\} = (V, X - \left\{x\right\})
 \end{align*}
 \end{notacion}
 
-\begin{correctidud}
+\begin{correctitud}
 Sea $G = (V,X_G)$ el grafo de la red de computadoras, donde cada nodo es una computadora, y cada arista es una conexión. Sea $S = (V,X)$ subgrafo de $G$, la solución construida por nuestro algoritmo, esto es: $T = (V, X_T)$ un árbol generador mínimo de $G$, más agregar la arista $e \in \left\{x \in X_G - X_T \mid l(x) \leq l(x') \; \forall x' \in X_G - X_T \right\}$, esto es, $X = X_T \cup \left\{e\right\}$. $S$ es un grafo conexo con exactamente un circuito simple $C$ tal que $e \in C$, por definición equivalente de árbol. Entonces, no existe $S' = (V,X')$ subgrafo de $G$ conexo con exactamente un circuito simple, tal que $costo(S) > costo(S')$, siendo para cualquier grafo $G = (V,X)$
 \begin{align*}
 costo(G) = \sum\limits_{\substack{x \in X}} l(x)
 \end{align*}
-\end{correctidud}
+\end{correctitud}
 \begin{proof}
 Supongamos que hay una solución mejor $S'$, esto es, $costo(S) > costo(S')$. \\
 \noindent Sea $e'$ cualquier arista del circuito de $S'$. Entonces,
