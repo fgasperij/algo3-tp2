@@ -149,14 +149,14 @@ Para ello vamos a modificar levemente el algoritmo anterior de recorrido de nues
 
 Con este algoritmo cuando terminemos de recorrer el sistema de vuelos, vamos a tener que agarrar el camino Verde, que nos lleve al primer vuelo que aterrice en la ciudad final y este marcado del mismo color.
 
-Para eso lo que haremos ser\'a obtener recursivamente las ciudades desde nuestra ciudad final, tomandome exactamente el primer vuelo que aterrice y sea de color verde.
+Para eso lo que haremos sera obtener recursivamente las ciudades desde nuestra ciudad final, tomandome exactamente el primer vuelo que aterrice en mi ciudad final.
 
 Ahora nuestra variable T, va a ser el horario de despegue de cada vuelo que haya tomado. 
 
-Es decir, si el primer vuelo que llega a mi ciudad final (o sea el de menor horario de aterrizaje) y tenga color verde tiene un horario de despegue a las 14hs y sale de la ciudad $c$, entonces voy a buscar los vuelos que esten marcados de verde y lleguen a c en horario menor o igual a 14hs. Recordemos aca entra en juego, lo de alargar el horario de aterrizaje 2 horas para cada vuelo.
+Es decir, si el primer vuelo que llega a mi ciudad final (o sea el de menor horario de aterrizaje) y tenga color verde tiene un horario de despegue a las 14hs y sale de la ciudad $c$, entonces voy a buscar los vuelos que esten marcados de verde y lleguen a c en horario menor o igual a 14hs. Recordemos aca entra en juego, lo de alargar el horario de aterrizaje, 2 horas para cada vuelo.
 Como mi vuelo pertenecia a un camino verde, existe al menos un vuelo que sale de $c$ y aterriza antes de las 14hs.
 
-Luego la sucesi\'on de vuelos obtenida de esta manera desde la ciudad final, comenzando con T = $\infty$ es una soluci\'on a nuestro problema ya que va desde a hasta b, y el \'ultimo vuelo de esa sucesi\'on es el de menor horario de aterrizaje en b, de los vuelos que llegan desde a hasta b por un camino verde.
+Luego la sucesi\'on de vuelos obtenida de esta manera desde la ciudad final, comenzando con T = $\infty$ es una soluci\'on a nuestro problema ya que va desde a hasta b, y el ultimo vuelo de esa sucesi\'on es el de menor horario de aterrizaje en b, de los vuelos que llegan desde a hasta b por un camino verde.
 
 \subsection{Demostración}
 
