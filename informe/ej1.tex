@@ -58,9 +58,61 @@ $S_{S.tamanio-1}$.aterrizaje$) \leq S'_{S'.tamanio-1}$.aterrizaje))
 
 Habiendo caracterizado la soluci\'on a nuestro problema en leguaje formal, vamos a tratar de encontrar una implementaci\'on para un algoritmo que devuelva una instancia de esa soluci\'on.
 
-Primero notamos que para encontrar el mejor itinerario de movimientos de un turista, yendo de ciudad a ciudad en aviones, iba a ser necesario en particular recorrer al menos una vez todos los vuelos existentes y ver a que otros vuelos nos llevaban. 
+Dados C:Conj(Vuelo), $inicio$:Ciudad, $destino$:Ciudad y el instante T:Nat, que va a ser un instante de tiempo.
 
-Notamos que dado un instante T, El flujo de vuelos que pod\'iamos tomarnos desde una ciudad dependia siempre de la ciudad inicial, y del momento en el que nos encontremos en esa ciudad, y nos iba a interesar solo los que finalizaran en la ciudad final.
+Sea la funci\'on:
+
+boolean ExisteVuelo(Conj(Vuelo) vuelos, Ciudad inicio,Ciudad destino,Nat T) $\equiv$
+
+(inicio $==$ destino) $\vee$ ($\exists$ v:Vuelo, v $\in$ vuelos) $/$ (v.inicio $==$ inicio $\wedge$ v.despegue - 2 $\geq$ T 
+
+$\wedge$ ExisteVuelo(vuelos,v.destino, destino, v.aterrizaje))) 
+
+Esta expresi\'on nos indica si dado un instante T, en alguna ciudad c existe una secuencia de vuelos valida que nos lleva desde c hasta la ciudad destino que queremos llegar.
+
+Solo nos va a interesar un vuelo v tal que exista un itinerario valido hasta tomarnos v y que exista un itinerario valido hasta nuestra ciudad destino a partir de tomarnos v.
+
+Dados C:Conj(Vuelo), $inicio$:Ciudad, $destino$:Ciudad.
+
+Podemos definir el conjunto Validos(C):Conj(Vuelo), como:
+
+($\forall$ v:Vuelo, v $\in$ Validos(C)) $\Leftrightarrow$ ((v.origen $==$ $inicio$ $\vee$ ($\exists$ v':Vuelo, v' $\in$ Validos(C) $/$ v'.destino $==$ v.origen $\wedge$ v'.aterrizaje + 2 $\leq$ v.despegue)) $\wedge$ ExisteVuelo(C,v.destino,$destino$,v.aterrizaje) $\wedge$ v $\in$ C)
+
+Dado este conjunto podemos definir el VueloMinimo:Vuelo, tal que VueloMinimo pertenezca al conjunto de vuelos validos y VueloMinimo sea el primero que aterrice en nuestra ciudad final.
+
+Dados C:Conj(Vuelo), $inicio$:Ciudad, $destino$:Ciudad.
+
+VueloMinimo(C,$inicio$,$destino$) $\equiv$ v:Vuelo $\Leftrightarrow$ (v $\in$ Validos(C) $\wedge$ v.destino $==$ $destino$ $\wedge$ ($\forall$ v':Vuelo, v' $\in$ Validos(C) $\wedge$ v'.destino $==$ $destino$) $\implies$ v.aterrizaje $\leq$ v'.aterrizaje)
+
+Nuestro algoritmo va a obtener este VueloMinimo. Las caracteristica de VueloMinimo es que es el primero de los vuelos que llegan a nuestro $destino$ por un itinerario valido.
+
+Asi que, cualquier itinerario valido que contenga a $destino$ en su ultimo vuelo va a ser soluci\'on de nuestro problema.
+
+Para ello solo deberiamos elegir vuelos que me lleven a mi ciudad inicial, utilizando como ultimo vuelo a VueloMinimo.
+
+Por lo tanto nuestro algoritmo final quedaria de la siguiente manera:
+
+\begin{algorithm}[H]
+\begin{algorithmic}[1]
+\STATE Sec$\langle$Vuelo$\rangle$ $itinerario$ $=$ $[]$
+\WHILE {(inicio != final) }
+	\STATE Vuelo min $=$ VueloMinimo(C,inicio,destino)
+	\STATE $itinerario$.agregar(min,0)
+	\STATE final = min.origen
+\ENDWHILE
+\RETURN $itinerario$
+\caption{Sec$\langle$Vuelo$\rangle$ itinerario(Conj(Ciudad) C, Ciudad inicio, Ciudad final)}% $\rightarrow$ int proximo}
+\end{algorithmic}
+\end{algorithm}
+
+Primero notamos que para encontrar el mejor itinerario de movimientos de un turista, yendo de ciudad a ciudad en aviones, iba a ser necesario recorrer los vuelos que sean posibles desde la ciudad donde estabamos parados y ver a que otros vuelos nos llevaban. 
+
+Notamos que dado un instante T, el flujo de vuelos que pod\'iamos tomarnos desde una ciudad dependia siempre de la ciudad inicial, y del momento en el que nos encontremos en esa ciudad, y nos iba a interesar solo los que finalizaran en la ciudad final con menor instante de aterrizaje.
+
+Luego para que nuestra soluc\'on tuviera el menor instante T de aterrizaje en $destino$, vamos a definir al m\'inimo vuelo posible en nuestra ciudad final tal que:
+
+m\'inimoFinal $\equiv$ v $\Leftrightarrow$ 
+
 
 Por lo tanto se podria visualizar el flujo de aviones de ciudad en ciudad como una grafo direccional donde los vertices son las ciudades, y existen aristas por cada uno de los vuelos. 
 
