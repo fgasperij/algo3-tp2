@@ -1,11 +1,71 @@
 \section{Problema 2: Caballos salvajes}
 
 \subsection{Presentación del problema}
+En este problema nos presentan un tablero de dimensiones conocidas pero no acotadas, $n \times n$,
+del mismo tipo que el de ajedrez, es decir un tablero cuadriculado:\\
+\begin{center}
+(TODO insertar imagen de tablero cuadriculado y a los lados llaves que digan 'n')
+\end{center}
+y un conjunto de caballos, piezas de ajedrez, en casillas también conocidas, por ejemplo:\\
+\begin{center}
+(TODO insertar imagen del tablero con algunas casillas con una C)
+\end{center}
+el objetivo es reunir a todos los caballos en una misma casilla del tablero con una cantidad
+de movimientos total, es decir sumando los movimientos que le tomo a todos los caballos, mínima.
+Los movimientos permitidos a los caballos son los mismos que los impuestos por las reglas de ajedrez:\\
+\begin{center}
+(TODO insertar imagen del tablero con una C y x's en los casilleros donde puede saltar el caballo)
+\end{center}
+La C representa la casilla donde está ubicado el caballo y X los lugares a los cuales podría saltar.
 
 \subsection{Resolución}
+Nosotros modelamos el problema con grafos con lo cual el problema es equivalente al de camino mínimo 
+con un origen y múltiples destinos. En este caso en particular como el salto de un caballo siempre 
+tiene el mismo costo basta recorrer el grafo con Breadth First Search (TODO agregar cita) y el camino mínimo queda 
+determinado como el camino en el árbol generador resultante.
+El modelo consiste en tomar a las casillas del tablero como nodos del grafo, las casillas en las que 
+hay caballos como nodos origen y existe una arista entre dos nodos, casillas, si de una a la otra se
+puede ir con un salto de caballo. Cabe destacar que el salto de caballo es simétrico: si con un salto
+de caballo se puede ir de la casilla $a$ a la $b$ entonces necesariamente también se puede con un 
+salto de caballo ir de la casilla $b$ a la $a$:\\
+\begin{center}
+(TODO insertar imagen de un tablero con la C y las x's y al lado una imagen de un tablero con un puntito en
+la C y aristas que lo unen a puntitos donde estaban las x's)
+\end{center}
+Los pasos para resolver el problema una vez modelado son bastante directos:
+\begin{enumerate}
+  \item Recorrer el grafo una vez por cada caballo presente tomando como origen el nodo, casilla, en la 
+    que se encuentra el caballo.
+  \item Sumar, en cada nodo, la cantidad de saltos que le toma a cada caballo llegar a él.
+  \item Recorrer todos los nodos y quedarse con alguno de los de suma mínima.
+\end{enumerate}
 
-\subsection{Demostración}
+\subsection{Pseudocódigo}
+\begin{algorithm}[H]
+  \begin{algorithmic}
+    %\STATE $\gets$ \WHILE{} \ENDWHILE \IF{} \ELSE \ENDIF
+    \STATE $distancias$ $\gets$ Matriz($n$, $n$)
+    \STATE $tablero$ $\gets$ Tablero($n$, $n$)
+    \STATE $caballos$ $\gets$ Conj($Casilla$)
+    \WHILE {$caballos \neq \emptyset$}
+      \STATE $origen$ $\gets$ $caballos$.next()
+      \STATE BFS($origen$, $tablero$, $distancias$)
+    \ENDWHILE
+    \STATE ($suma_{min}$, $casilla_{min}$) $\gets$ MIN($distancias$)
+    \caption{caballos\_salvajes}
+  \end{algorithmic}
+\end{algorithm}
+
+
+\subsection{Demostración de correctitud}
+
+
 
 \subsection{Análisis de complejidad}
+No es necesario construir el grafo explícitamente ya que los saltos de caballo desde una casilla pueden contruirse 
+ad hoc, por lo tanto, dada un nodo, casilla, obtener los vecinos del mismo tiene costo $O(1)$ porque a lo sumo
+puede contar con 8 vecinos:
+(TODO insertar imagen de un tablero con una C en el centro, otra en un rincón y otra en una banda, indicando en cada
+caso los saltos posibles)
 
 \subsection{Tests de complejidad}
