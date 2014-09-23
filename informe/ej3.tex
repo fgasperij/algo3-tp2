@@ -37,6 +37,97 @@ Tenemos entonces caracterizada a una solución como un subgrafo generador de $G$
 \end{enumerate}
 Nuestro algoritmo construirá entonces el subgrafo $S = (V, X_T \cup \left\{e\right\})$. En la demostración de correctitud veremos que efectivamente $S$ es una solución óptima del problema.
 
+Para obtener el árbol generador mínimo usamos el algoritmo de Prim, luego a este grafo le agregaremos la arista más chica de las que no pertenecen a él, y finalmente para encontrar el ciclo usaremos la función $hallarCircuito$, que hace DFS sobre la solución.
+
+\subsubsection{Pseudocódigo}
+%aca va el pseudocodigo del problema.
+\begin{algorithm}[H]
+\begin{algorithmic}[1]
+\caption{LaComunidadDelAnillo(aristasGrafo)}
+\STATE verticesAGM $\leftarrow$ vacía
+\STATE aristasAGM $\leftarrow$ vacía
+\STATE aristasCandidatasAGM $\leftarrow$ vacía
+\STATE Pongo el vértice 0 en verticesAGM, y sus aristas en aristasCandidatasAGM
+\WHILE {$|$aristasAGM$|$ $<$ n - 1 \AND $|$aristasCandidatasAGM$|$ $>$ 0}
+	\STATE Tomar la arista candidata de menor costo (quitándola además de las candidatas)
+    \IF {La arista incide en dos vértices del AGM}
+        \STATE No la puedo usar
+    \ELSE
+        \STATE Insertar el nuevo vértice en verticesAGM
+        \STATE Eliminar la arista de aristasGrafo
+        \STATE Insertar la arista en aristasAGM
+        \FOR {\textbf{each} arista del nuevo vértice (que no fue considerada antes)}
+            \STATE Insertar arista en aristasCandidatasAGM
+        \ENDFOR
+    \ENDIF
+\ENDWHILE
+\IF {$|$aristasAGM$|$ $<$ n - 1 \OR $|$aristasGrafo$|$ == 0}
+    \STATE No hay solución
+\ENDIF
+\STATE Arista aristaMenor $\leftarrow$ Arista de menor costo de aristasGrafo
+\STATE Vertice primero $\leftarrow$ El primer vértice de aristaMenor (podría ser cualquiera de los dos vértices, no afecta al algoritmo)
+\STATE Insertar aristaMenor en aristasAGM
+\STATE Defino array de aristas aristaAnterior$[$n$]$
+\STATE Defino array de enteros verticeVisitadoCount$[$n$]$ inicializándolo todo en $0$
+\STATE Defino array de vertices (enteros) verticeAnterior$[$n$]$ inicializándolo todo en $-1$
+\STATE Llamar a la función hallarCircuito(verticeVisitadoCount, primero, verticeAnterior, aristaAnterior)
+\end{algorithmic}
+\end{algorithm}
+
+Como sabemos que el vértice $primero$ forma parte del circuito simple, las aristas del circuito se pueden obtener pidiendo $aristaAnterior[primero]$, lo que devuelve una arista y un vértice nuevo, al que se le pedirá de nuevo lo mismo, hasta llegar a $primero$.
+
+\begin{algorithm}[H]
+\begin{algorithmic}[1]
+\caption{Vertice hallarCircuito(verticeVisitadoCount, verticeAnterior, aristaAnterior)}
+    \STATE pila$<$Vertice$>$ pilaVertices $\leftarrow$ pila vacía
+    \STATE pilaVertices.push(0) \textcolor{CadetBlue}{// Pusheo un vértice para empezar}
+    \STATE bool hayCircuito $\leftarrow$ false
+    \STATE Vertice res $\leftarrow$ -1
+    \WHILE {(\NOT hayCircuito) \AND ($|$pilaVertices$|$ $>$ 0)}
+        \STATE Vertice actual $\leftarrow$ pilaVertices.top()
+        \STATE pilaVertices.pop()
+        \STATE verticeVisitadoCount$[$actual$]$++
+        \IF {verticeVisitadoCount$[$actual$]$ == 2}
+            \STATE hayCircuito $\leftarrow$ true
+            \STATE res $\leftarrow$ actual
+        \ELSE
+            \FOR {\textbf{each} arista del vértice actual}
+                \STATE Vertice nuevoActual $\leftarrow$ El otro vértice de la arista
+                \STATE Vertice nuevoAnterior $\leftarrow$ actual
+                \IF {nuevoActual == verticeAnterior$[$actual$]$}
+                    \STATE \textcolor{CadetBlue}{// Si estoy acá es porque estaba volviendo por la misma arista que vine (formando un circuito NO simple)}
+                \ELSE 
+                    \STATE aristaAnterior$[$nuevoActual$]$ $\leftarrow$ arista
+                    \STATE verticeAnterior$[$nuevoActual$]$ $\leftarrow$ nuevoAnterior
+                    \STATE pilaVertices.push(nuevoActual)
+                \ENDIF
+            \ENDFOR
+        \ENDIF
+    \ENDWHILE
+    \RETURN res
+\end{algorithmic}
+\end{algorithm}
+
+%\begin{algorithm}[H]
+%\begin{algorithmic}[1]
+%\caption{hallarCircuito(verticeVisitado, actual, verticeAnterior, aristaAnterior)}
+%\IF {\NOT verticeVisitado$[$actual$]$}
+    %\STATE verticeVisitado[actual] $\leftarrow$ true
+    %\FOR {\textbf{each} arista del vértice actual}
+        %\STATE Vertice nuevoActual $\leftarrow$ El otro vértice de la arista
+        %\STATE Vertice nuevoAnterior $\leftarrow$ actual
+        %\IF {nuevoActual == verticeAnterior$[$actual$]$}
+            %\STATE \textcolor{CadetBlue}{// Si estoy acá es porque estaba volviendo por la misma arista que vine (formando un circuito NO simple)}
+        %\ELSE
+            %\STATE aristaAnterior$[$nuevoActual$]$ $\leftarrow$ arista
+            %\STATE verticeAnterior$[$nuevoActual$]$ $\leftarrow$ nuevoAnterior
+            %\STATE hallarCircuito(verticeVisitado, nuevoActual, verticeAnterior, aristaAnterior)
+        %\ENDIF
+    %\ENDFOR
+%\ENDIF
+%\end{algorithmic}
+%\end{algorithm}
+
 \textbf{COMPLETAR}
 
 \subsection{Demostración}

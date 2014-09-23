@@ -2,6 +2,7 @@
 #include <list>
 #include <vector>
 #include <set>
+#include <stack>
 
 using namespace std;
 
@@ -68,7 +69,51 @@ struct comparacionArista {
     }
 };
 
-void hallarCircuito(vector< list<Arista> > & aristasDeCadaVerticeAGM, bool * verticeVisitado, Vertice * verticeAnterior, Vertice actual, Vertice anterior, Arista * aristaAnterior);
+//void hallarCircuito(vector< list<Arista> > & aristasDeCadaVerticeAGM, bool * verticeVisitado, Vertice actual, Vertice * verticeAnterior, Arista * aristaAnterior) {
+    //if (!verticeVisitado[actual]) { // El vertice no fue visitado, tengo que seguir
+        //verticeVisitado[actual] = true;
+        //for (auto it = aristasDeCadaVerticeAGM[actual].begin(); it != aristasDeCadaVerticeAGM[actual].end(); it++) {
+            //Vertice nuevoActual = it->dameElOtroVertice(actual);
+            //Vertice nuevoAnterior = actual;
+            //if (nuevoActual == verticeAnterior[actual]) {
+                 ////Si estoy acá es porque estaba volviendo por la misma arista que vine (formando un circuito NO simple)
+            //} else {
+                //aristaAnterior[nuevoActual] = *it;
+                //verticeAnterior[nuevoActual] = nuevoAnterior;
+                //hallarCircuito(aristasDeCadaVerticeAGM, verticeVisitado, nuevoActual, verticeAnterior, aristaAnterior);
+            //}
+        //}
+    //}
+//}
+
+Vertice hallarCircuito2(vector< list<Arista> > & aristasDeCadaVerticeAGM, int * verticeVisitadoCount, Vertice * verticeAnterior, Arista * aristaAnterior) {
+    stack<Vertice> pilaVertices;
+    pilaVertices.push(0);
+    bool hayCircuito = false;
+    Vertice res = -1;
+    while (!hayCircuito && pilaVertices.size() > 0) {
+        Vertice actual = pilaVertices.top();
+        pilaVertices.pop();
+        verticeVisitadoCount[actual]++;
+        if (verticeVisitadoCount[actual] == 2) {
+            hayCircuito = true;
+            res = actual;
+        } else {
+            for (auto it = aristasDeCadaVerticeAGM[actual].begin(); it != aristasDeCadaVerticeAGM[actual].end(); it++) {
+                Vertice nuevoActual = it->dameElOtroVertice(actual);
+                Vertice nuevoAnterior = actual;
+                if (nuevoActual == verticeAnterior[actual]) {
+                    // Si estoy acá es porque estaba volviendo por la misma arista que vine (formando un circuito NO simple)
+                } else {
+                    aristaAnterior[nuevoActual] = *it;
+                    verticeAnterior[nuevoActual] = nuevoAnterior;
+                    pilaVertices.push(nuevoActual);
+                }
+            }
+        }
+    }
+    return res;
+}
 
 int main(int argc, const char* argv[]) {
     unsigned int n, m, costoTotal = 0;                          // n = #vertices, m = #aristas
@@ -155,16 +200,21 @@ int main(int argc, const char* argv[]) {
     aristasDeCadaVerticeAGM[segundo].push_back(menor);
     // Tengo que encontrar el circuito simple, esto es, el anillo
     Arista aristaAnterior[n];
-    bool verticeVisitado[n]; for (unsigned int i = 0; i < n; i++) verticeVisitado[i] = false;
+    //bool verticeVisitado[n]; for (unsigned int i = 0; i < n; i++) verticeVisitado[i] = false;
     Vertice verticeAnterior[n]; for (unsigned int i = 0; i < n; i++) verticeAnterior[i] = -1;
-    verticeVisitado[primero] = true;
-    aristaAnterior[segundo] = menor;
+    int verticeVisitadoCount[n]; for (unsigned int i = 0; i < n; i++) verticeVisitadoCount[i] = 0;
     
-    hallarCircuito(aristasDeCadaVerticeAGM, verticeVisitado, verticeAnterior, segundo, primero, aristaAnterior); // costo O(m) = O(n) porque el grafo solución tiene n aristas (el AGM tiene m = n - 1, +1 arista agregada).
+    hallarCircuito2(aristasDeCadaVerticeAGM, verticeVisitadoCount, verticeAnterior, aristaAnterior);
+    
+    // HALLAR CIRCUITO VIEJO:
+    //verticeVisitado[primero] = true;
+    //aristaAnterior[segundo] = menor;
+    //verticeAnterior[segundo] = primero;
+    //hallarCircuito(aristasDeCadaVerticeAGM, verticeVisitado, primero, verticeAnterior, aristaAnterior); // costo O(m) = O(n) porque el grafo solución tiene n aristas (el AGM tiene m = n - 1, +1 arista agregada).
     
     Vertice actual = primero;
     do {
-        aristasAGM.erase(aristaAnterior[actual]);               // En aristasGM van a quedar las aristas fuera del circuito
+        aristasAGM.erase(aristaAnterior[actual]);               // En aristasAGM van a quedar las aristas fuera del circuito
         aristasAnillo.push_back(aristaAnterior[actual]);        // Lo contrario para aristasAnillo
         actual = verticeAnterior[actual];
     } while(actual != primero);
@@ -178,27 +228,4 @@ int main(int argc, const char* argv[]) {
     }
     
     return 0;
-}
-
-
-// A --> B
-// 1     1      anterior de B = A
-//   <--      ¿A visitado? SI. ¿Vengo de B (esto es, el circuito NO es simple)? SI. Venir de B = verticeAnterior[B] = A
-
-void hallarCircuito(vector< list<Arista> > & aristasDeCadaVerticeAGM, bool * verticeVisitado, Vertice * verticeAnterior, Vertice actual, Vertice anterior, Arista * aristaAnterior) {
-    if (verticeVisitado[actual]) {                      // El vertice actual ya fue visitado antes
-        if (verticeAnterior[anterior] != actual) {      // Si es FALSE significa que estoy haciendo un circuito NO simple
-            verticeAnterior[actual] = anterior;
-        }
-    } else {                                            // El vertice no fue visitado, tengo que seguir
-        verticeVisitado[actual] = true;
-        verticeAnterior[actual] = anterior;
-        for (auto it = aristasDeCadaVerticeAGM[actual].begin(); it != aristasDeCadaVerticeAGM[actual].end(); it++) {
-            Vertice nuevoActual = it->dameElOtroVertice(actual);
-            Vertice nuevoAnterior = actual;
-            if (nuevoActual == anterior) continue;
-            aristaAnterior[nuevoActual] = *it;
-            hallarCircuito(aristasDeCadaVerticeAGM, verticeVisitado, verticeAnterior, nuevoActual, nuevoAnterior, aristaAnterior);
-        }
-    }
 }
