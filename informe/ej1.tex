@@ -24,7 +24,7 @@ Dado $vuelos$:Conj(Vuelo):
 
 Llamemos a $ciudadades$:Conj(Ciudad) al conjunto tal que:
 
-($\forall$ $c$:Ciudad, $c$ $\in$ $ciudades$)  $\Leftrightarrow$ ($\exists$ $v$:Vuelo$/$ $v$ $\in$ $vuelos$ $\wedge$ ($v$.origen $\equiv$ $c$ $\vee$ $v$.destino $\equiv$ $c$))
+($\forall$ $c$:Ciudad, $c$ $\in$ $ciudades$)  $\Leftrightarrow$ ($\exists$ $v,v'$:Vuelo$/$ $v$,$v'$) $\subset$ $vuelos$ $\wedge$ ($v$.origen $\equiv$ $c$ $\vee$ $v'$.destino $\equiv$ $c$))
 
 Dadas $a,b$:Ciudad, $a,b \in ciudades$. 
 
@@ -34,15 +34,17 @@ esItinerarioValido(Sec$<$Vuelo$>$ $S$, Ciudad a, Ciudad b) $\equiv$
  
 ($S_{0}$.origen $\equiv a \wedge S_{S.tamanio-1}$.destino$ \equiv b) \wedge$ 
 
-($\forall$ $i$:Nat, 0 $<$ i $<S.tamanio$)($S_{i}$.destino $\equiv$ $S_{i+1}$.origen 
+($\forall$ $i$:Nat, 0 $\leq$ i $<S.tamanio-1$)($S_{i}$.destino $\equiv$ $S_{i+1}$.origen 
 
 $\wedge$ $S_{i}$.aterrizaje + 2 $\leq$ $S_{i+1}$.despegue))
 
+---------------------
 
 Sec$<$Vuelo$>$ s $\subseteq$ Conj(Vuelo) c $\equiv$ 
 
 ($\forall i:$Nat, 0 $\leq i \geq$ s )($s_{i}$ $\in $ c) 
  
+---------------------------------------------------------------------------------------------
 
 Se nos pide encontrar $S$:Sec$<$Vuelo$>$ tal que 
 
