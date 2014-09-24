@@ -177,6 +177,9 @@ En la posicion 0 se encuentra el aerpuerto de la ciudad inicial, y en la posicio
 \end{algorithmic}
 \end{algorithm}
 
+Esta funcion implementada sobre un trie o sobre un hashmap, para el diccionario de ids me daria una complejidad final al algoritmo cercana a O(n) en n numero de vuelos. Los nombres de la ciudad tienden a ser Strings de bajo costo de procesamiento en un trie, y en un hashmap la cantidad total de ciudades con aeropuertos en el mundo, es bastante baja por lo tanto se podr\'ia implementar de forma eficiente.
+Nuestra implementaci\'on es en un treeset.
+
 \begin{algorithm}[H]
 \begin{algorithmic}[1]
 \IF {(inicio $==$ destino)}	
