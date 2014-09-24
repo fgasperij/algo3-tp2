@@ -70,43 +70,44 @@ Para obtener el árbol generador mínimo usamos el algoritmo de Prim, luego a es
 \STATE Defino array de aristas aristaAnterior$[$n$]$
 \STATE Defino array de enteros verticeVisitadoCount$[$n$]$ inicializándolo todo en $0$
 \STATE Defino array de vertices (enteros) verticeAnterior$[$n$]$ inicializándolo todo en $-1$
-\STATE Llamar a la función hallarCircuito(verticeVisitadoCount, primero, verticeAnterior, aristaAnterior)
+\STATE \textbf{COMPLETAR}
+%\STATE Llamar a la función hallarCircuito(verticeVisitadoCount, verticeAnterior, aristaAnterior)
 \end{algorithmic}
 \end{algorithm}
 
-Como sabemos que el vértice $primero$ forma parte del circuito simple, las aristas del circuito se pueden obtener pidiendo $aristaAnterior[primero]$, lo que devuelve una arista y un vértice nuevo, al que se le pedirá de nuevo lo mismo, hasta llegar a $primero$.
+%Como sabemos que el vértice $primero$ forma parte del circuito simple, las aristas del circuito se pueden obtener pidiendo $aristaAnterior[primero]$, lo que devuelve una arista y un vértice nuevo, al que se le pedirá de nuevo lo mismo, hasta llegar a $primero$.
 
-\begin{algorithm}[H]
-\begin{algorithmic}[1]
-\caption{Vertice hallarCircuito(verticeVisitadoCount, verticeAnterior, aristaAnterior)}
-    \STATE pila$<$Vertice$>$ pilaVertices $\leftarrow$ pila vacía
-    \STATE pilaVertices.push(0) \textcolor{CadetBlue}{// Pusheo un vértice para empezar}
-    \STATE bool hayCircuito $\leftarrow$ false
-    \STATE Vertice res $\leftarrow$ -1
-    \WHILE {(\NOT hayCircuito) \AND ($|$pilaVertices$|$ $>$ 0)}
-        \STATE Vertice actual $\leftarrow$ pilaVertices.top()
-        \STATE pilaVertices.pop()
-        \STATE verticeVisitadoCount$[$actual$]$++
-        \IF {verticeVisitadoCount$[$actual$]$ == 2}
-            \STATE hayCircuito $\leftarrow$ true
-            \STATE res $\leftarrow$ actual
-        \ELSE
-            \FOR {\textbf{each} arista del vértice actual}
-                \STATE Vertice nuevoActual $\leftarrow$ El otro vértice de la arista
-                \STATE Vertice nuevoAnterior $\leftarrow$ actual
-                \IF {nuevoActual == verticeAnterior$[$actual$]$}
-                    \STATE \textcolor{CadetBlue}{// Si estoy acá es porque estaba volviendo por la misma arista que vine (formando un circuito NO simple)}
-                \ELSE 
-                    \STATE aristaAnterior$[$nuevoActual$]$ $\leftarrow$ arista
-                    \STATE verticeAnterior$[$nuevoActual$]$ $\leftarrow$ nuevoAnterior
-                    \STATE pilaVertices.push(nuevoActual)
-                \ENDIF
-            \ENDFOR
-        \ENDIF
-    \ENDWHILE
-    \RETURN res
-\end{algorithmic}
-\end{algorithm}
+%\begin{algorithm}[H]
+%\begin{algorithmic}[1]
+%\caption{Vertice hallarCircuito(verticeVisitadoCount, verticeAnterior, aristaAnterior)}
+    %\STATE pila$<$Vertice$>$ pilaVertices $\leftarrow$ pila vacía
+    %\STATE pilaVertices.push(0) \textcolor{CadetBlue}{// Pusheo un vértice para empezar}
+    %\STATE bool hayCircuito $\leftarrow$ false
+    %\STATE Vertice res $\leftarrow$ -1
+    %\WHILE {(\NOT hayCircuito) \AND ($|$pilaVertices$|$ $>$ 0)}
+        %\STATE Vertice actual $\leftarrow$ pilaVertices.top()
+        %\STATE pilaVertices.pop()
+        %\STATE verticeVisitadoCount$[$actual$]$++
+        %\IF {verticeVisitadoCount$[$actual$]$ == 2}
+            %\STATE hayCircuito $\leftarrow$ true
+            %\STATE res $\leftarrow$ actual
+        %\ELSE
+            %\FOR {\textbf{each} arista del vértice actual}
+                %\STATE Vertice nuevoActual $\leftarrow$ El otro vértice de la arista
+                %\STATE Vertice nuevoAnterior $\leftarrow$ actual
+                %\IF {nuevoActual == verticeAnterior$[$actual$]$}
+                    %\STATE \textcolor{CadetBlue}{// Si estoy acá es porque estaba volviendo por la misma arista que vine (formando un circuito NO simple)}
+                %\ELSE 
+                    %\STATE aristaAnterior$[$nuevoActual$]$ $\leftarrow$ arista
+                    %\STATE verticeAnterior$[$nuevoActual$]$ $\leftarrow$ nuevoAnterior
+                    %\STATE pilaVertices.push(nuevoActual)
+                %\ENDIF
+            %\ENDFOR
+        %\ENDIF
+    %\ENDWHILE
+    %\RETURN res
+%\end{algorithmic}
+%\end{algorithm}
 
 %\begin{algorithm}[H]
 %\begin{algorithmic}[1]
