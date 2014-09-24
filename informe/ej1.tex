@@ -54,6 +54,14 @@ $(\forall$ $S'$:Sec$<$Vuelo$>$ $/$ (esItinerarioValido($S'$,a,b)) $\wedge$ ($S' 
 
 $S_{S.tamanio-1}$.aterrizaje$) \leq S'_{S'.tamanio-1}$.aterrizaje))
 
+Se nos pide encontrar $S$:Sec$<$Vuelo$>$ tal que 
+
+esItinerarioValido($S$,a,b) $\wedge$ ($S \subseteq$ vuelos) $\wedge$ 
+
+$(\forall$ $S'$:Sec$<$Vuelo$>$ $/$ (esItinerarioValido($S'$,a,b)) $\wedge$ ($S' \subseteq$ vuelos) $\implies$  
+
+$S_{S.tamanio-1}$.aterrizaje$) \leq S'_{S'.tamanio-1}$.aterrizaje))
+
 
 \newpage
 \subsection{Resolución}
@@ -90,22 +98,125 @@ Nuestro algoritmo va a obtener este VueloMinimo. Las caracteristica de VueloMini
 
 Asi que, cualquier itinerario valido que contenga a $destino$ en su ultimo vuelo va a ser soluci\'on de nuestro problema.
 
-Para ello solo deberiamos elegir vuelos que me lleven a mi ciudad inicial, utilizando como ultimo vuelo a VueloMinimo.
+Para ello solo deberiamos elegir vuelos que me lleven a mi ciudad inicial, utilizando como ultimo vuelo a VueloMinimo. En particular vamos a obtener siempre el primer vuelo que llegue a la ciudad desde donde sale mi actual VueloMinimo y sean pertenezcan al conjunto de vuelos posibles.
 
+\newpage
 Por lo tanto nuestro algoritmo final quedaria de la siguiente manera:
+
+Definimos Color como un enum $[$BLANCO,ROJO,VERDER$]$
+
+Definimos un Aeropuerto como un tupla $\langle$ ciudad$:$Ciudad,vuelosQueSalen$:
+$Conj(Vuelo),
+
+vuelosQueLlegan$:$Conj(Vuelo),id$:$Nat,color$:$Color $\rangle$ 
+
+
 
 \begin{algorithm}[H]
 \begin{algorithmic}[1]
+\STATE Aeropuerto[] aeropuertos = construirArrayDeAeropuertos(vuelos,inicio,final)
+
+$//$Esta funcion va a asignarle un id a cada una de las ciudades y luego construir un array donde en la posicion i, se encuentra la ciudad con id $=$ 1
+
 \STATE Sec$\langle$Vuelo$\rangle$ $itinerario$ $=$ $[]$
-\WHILE {(inicio != final) }
-	\STATE Vuelo min $=$ VueloMinimo(C,inicio,destino)
+
+$//$ Esta sesgada la funcion con T $=$ -2 ya que vamos a preguntar si existeVuelo a partir de T $=$ 0	
+
+
+Esta funcion tambien me va a colorear de verde los vuelos que encuentre que lleguen a destino
+
+En la posicion 0 se encuentra el aerpuerto de la ciudad inicial, y en la posicio 1, el de la ciudad final
+
+\IF{(existeVuelo(aeropuertos, aeropuertos[0],aeropuertos[1],-2))}
+	\STATE Vuelo min = vueloMinimo(aeropuerto$[1]$.vuelosQueLlegan())
+\ENDIF
+\STATE $itinerario$.agregar(min,0)
+\WHILE {(min.inicio != inicio) }
+	\STATE Vuelo min $=$ vueloMinimo(min.inicio.vuelosQueLlegan())
 	\STATE $itinerario$.agregar(min,0)
-	\STATE final = min.origen
 \ENDWHILE
 \RETURN $itinerario$
-\caption{Sec$\langle$Vuelo$\rangle$ itinerario(Conj(Ciudad) C, Ciudad inicio, Ciudad final)}% $\rightarrow$ int proximo}
+\caption{Sec$\langle$Vuelo$\rangle$ itinerario(Conj(Vuelo) vuelos, Ciudad inicio, Ciudad final)}% $\rightarrow$ int proximo}
 \end{algorithmic}
 \end{algorithm}
+
+
+\begin{algorithm}[H]
+\begin{algorithmic}[1]
+\STATE Conj(Ciudad) ciudades = null
+\STATE ciudades.agregar(inicio)
+\STATE ciudades.agregar(final)
+\FOR {(Vuelo vuelo: Vuelos)}	
+	\STATE ciudades.agregar(vuelo.origen)
+	\STATE ciudades.agregar(vuelo.destino)
+\ENDFOR
+\STATE Aeropuerto[] aeropuertos = new Aeropuerto[ciudades.size];
+\STATE Mapa$\langle$Ciudad, Nat$\rangle$ ids $=$ $\emptyset$
+\STATE ids.agregar(inicio,0)
+\STATE ids.agregar(final,1)
+\STATE aeropuertos[0] = new Aeropuerto (inicio,$\emptyset$,$\emptyset$,0)
+\STATE aeropuertos[1] = new Aeropuerto (final,$\emptyset$,$\emptyset$,1)
+\STATE ciudades.remover(inicio)
+\STATE ciudades.remover(final)
+\STATE Nat i = 2
+\FOR {(Ciudad ciudad: ciudades)}	
+	\STATE aeropuertos[i] = new Aeropuerto (ciudad,$\emptyset$,$\emptyset$,i)
+	\STATE ids.agregar(ciudad,i++)
+\ENDFOR
+\STATE i $=$ 1
+\FOR {(Vuelo vuelo: Vuelos)}	
+	\STATE vuelo.id = i	
+	\STATE vuelo.color = BLANCO	
+	\STATE int id = ids.obtener(vuelo.origen)
+	\STATE ciudades.obtener(id).vuelosQueSalen().agregar(vuelo)
+	\STATE int id = ids.obtener(vuelo.destino)
+	\STATE ciudades.obtener(id).vuelosQueLlegan().agregar(vuelo)
+\ENDFOR
+\RETURN ciudades
+\caption{Aeropuerto[] construirArrayDeAeropuertos(Conj(Vuelo) vuelos, Ciudad inicio, Ciudad final)}% $\rightarrow$ int proximo}
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\begin{algorithmic}[1]
+\IF {(inicio $==$ destino)}	
+		\RETURN TRUE
+\ENDIF
+\STATE boolean llego $=$ false;
+\FOR{(Vuelo v $:$ inicio$.$vuelosQueSalen)}	    
+    \IF {(v.despegue $\geq$ t+2)}	
+		\IF{(v.color $==$ VERDE)}
+			\STATE llego = TRUE
+        \ENDIF
+        \IF{(v.color $==$ BLANCO)}     				        	
+        		\IF {(existeVuelo(aeropuertos,v.destino,final,v.aterrizaje)}
+				\STATE llego = true;
+				\STATE v.color = VERDE;
+			\ELSE
+				\STATE v.color = ROJO;								
+	    		\ENDIF    			
+		\ENDIF		    
+    \ENDIF
+\ENDFOR
+\RETURN $llego$
+\caption{boolean existeVuelo(Aeropuerto[] aeropuertos, Aeropuerto inicio, Aeropuerto final, int t)}% $\rightarrow$ int proximo}
+\end{algorithmic}
+\end{algorithm}
+
+
+\begin{algorithm}[H]
+\begin{algorithmic}[1]
+\STATE Vuelo min = null
+\FOR{(Vuelo v: vuelos)}
+	\STATE min $=$ (min$==$null $\vee$ v.aterrizaje $\leq$ min.aterrizaje) $\wedge$ v.color $==$ VERDE
+\ENDFOR
+\RETURN min
+\caption{Vuelo vueloMinimo(Conj(Vuelo) vuelos)}% $\rightarrow$ int proximo}
+\end{algorithmic}
+\end{algorithm}
+
+//A PARTIR DE ACA NO SE QUE VOY A PONER Y QUE NO
+
 
 Primero notamos que para encontrar el mejor itinerario de movimientos de un turista, yendo de ciudad a ciudad en aviones, iba a ser necesario recorrer los vuelos que sean posibles desde la ciudad donde estabamos parados y ver a que otros vuelos nos llevaban. 
 
