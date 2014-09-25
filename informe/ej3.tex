@@ -37,16 +37,20 @@ Tenemos entonces caracterizada a una solución como un subgrafo generador de $G$
 \end{enumerate}
 Nuestro algoritmo construirá entonces el subgrafo $S = (V, X_T \cup \left\{e\right\})$. En la demostración de correctitud veremos que efectivamente $S$ es una solución óptima del problema.
 
-Para obtener el árbol generador mínimo usamos el algoritmo de Prim, luego a este grafo le agregaremos la arista más chica de las que no pertenecen a él, y finalmente para encontrar el ciclo usaremos la función $hallarCircuito$, que hace DFS sobre la solución.
+Para obtener el árbol generador mínimo usamos el algoritmo de Prim, luego a este grafo le agregaremos la arista más chica de las que no pertenecen a él, y finalmente para encontrar el ciclo usaremos la función DFS\_visit, que hace un Depth-First Search sobre la solución para encontrar al único circuito simple.
+
+La función DFS\_visit es la misma que la presentada en el libro de Cormen \emph{Introduction to Algorithms}\cite[p.~604]{cormen} añadiéndole la funcionalidad de distinguir un \emph{back edge} (esto es, una arista que efectivamente cierra un ciclo en el grafo). En el libro, se llama primero a la función DFS, que inicializa todos los vértices con color blanco (esto significa que no fueron visitados), y luego llama a DFS\_visit para cada uno de los vértices del grafo que tengan ese color. Como nuestro grafo solución es conexo, alcanza llamar a DFS\_visit con un sólo vértice para que DFS recorra todo el grafo. En particular, la llamaremos con un vértice que sabemos que está en el ciclo, esto es, con uno de los vértices en los que incide la arista que agregamos al final. Así, al finalizar DFS\_visit, como el vértice tendrá necesariamente un \emph{back edge}, lo usaremos para reconstruir el único ciclo (el \emph{back edge} es una arista del ciclo, y luego alcanza con pedir el anterior del otro vértice hasta que lleguemos al mismo con el que llamamos a DFS\_visit originalmente). 
+
+La información que nos da DFS\_visit la guardamos en un array de la estructura infoVerticeDFS, donde la posición i-ésima corresponde al vértice i-ésimo. Este array inicializa todos los vértices en el color blanco. Luego, cada vez que visitamos un vértice, es decir, cada vez que se ejecuta DFS\_visit, el vértice se pone de color gris, hasta que se terminen de considerar sus vértices adyacentes. Una vez hecho esto, se pone de color negro. Entonces, si al visitar un vértice ocurre que entre sus adyacentes hay uno coloreado gris, y no es el anterior al actual (de lo contrario sería como volver por el mismo camino, lo cual no es un circuito simple), esto implica que la arista que conecta con ese vértice es un \emph{back edge} (porque como está gris, todavía estábamos recorriendo caminos que salían de ese vértice, y volvimos a él), lo cual guardaremos en la información del vértice ya visitado. Por lo tanto, si la primera vez que llamamos a DFS\_visit lo hacemos con un vértice del circuito, necesariamente tendremos su único \emph{back edge} al finalizar.
 
 \subsubsection{Pseudocódigo}
-%aca va el pseudocodigo del problema.
+
 \begin{algorithm}[H]
 \begin{algorithmic}[1]
 \caption{LaComunidadDelAnillo(aristasGrafo)}
-\STATE verticesAGM $\leftarrow$ vacía
-\STATE aristasAGM $\leftarrow$ vacía
-\STATE aristasCandidatasAGM $\leftarrow$ vacía
+\STATE Conjunto(Vertice) verticesAGM $\leftarrow$ vacía
+\STATE Conjunto(Arista) aristasAGM $\leftarrow$ vacía
+\STATE Conjunto(Arista) aristasCandidatasAGM $\leftarrow$ vacía
 \STATE Pongo el vértice 0 en verticesAGM, y sus aristas en aristasCandidatasAGM
 \WHILE {$|$aristasAGM$|$ $<$ n - 1 \AND $|$aristasCandidatasAGM$|$ $>$ 0}
 	\STATE Tomar la arista candidata de menor costo (quitándola además de las candidatas)
@@ -67,69 +71,45 @@ Para obtener el árbol generador mínimo usamos el algoritmo de Prim, luego a es
 \STATE Arista aristaMenor $\leftarrow$ Arista de menor costo de aristasGrafo
 \STATE Vertice primero $\leftarrow$ El primer vértice de aristaMenor (podría ser cualquiera de los dos vértices, no afecta al algoritmo)
 \STATE Insertar aristaMenor en aristasAGM
-\STATE Defino array de aristas aristaAnterior$[$n$]$
-\STATE Defino array de enteros verticeVisitadoCount$[$n$]$ inicializándolo todo en $0$
-\STATE Defino array de vertices (enteros) verticeAnterior$[$n$]$ inicializándolo todo en $-1$
-\STATE \textbf{COMPLETAR}
-%\STATE Llamar a la función hallarCircuito(verticeVisitadoCount, verticeAnterior, aristaAnterior)
+\STATE infoVerticeDFS info$[$n$]$ \textcolor{CadetBlue}{// Ésto tiene la información del recorrido DFS, se inicializan los vértices en BLANCO}
+\STATE Llamar a la función DFS\_visit(info, primero) sobre el subgrafo solución
+\STATE Arista backEdge $\leftarrow$ info[primero].backEdges.front()
+\STATE Lista(Arista) aristasAnillo $\leftarrow$ vacía
+\STATE Insertar backEdge en aristasAnillo
+\STATE Eliminar backEdge de aristasAGM
+\STATE Vertice actual $\leftarrow$ backEdge.dameElOtroVertice(primero)
+\WHILE {actual $\neq$ primero}
+    \STATE Eliminar info[actual].aristaAnterior de aristasAGM
+    \STATE Insertar info[actual].aristaAnterior en aristasAnillo
+    \STATE actual $\leftarrow$ info[actual].verticeAnterior
+\ENDWHILE
 \end{algorithmic}
 \end{algorithm}
 
-%Como sabemos que el vértice $primero$ forma parte del circuito simple, las aristas del circuito se pueden obtener pidiendo $aristaAnterior[primero]$, lo que devuelve una arista y un vértice nuevo, al que se le pedirá de nuevo lo mismo, hasta llegar a $primero$.
+Al finalizar el algoritmo, las aristas del circuito de la solución óptima quedan en $aristasAnillo$, y el resto en $aristasAGM$.
 
-%\begin{algorithm}[H]
-%\begin{algorithmic}[1]
-%\caption{Vertice hallarCircuito(verticeVisitadoCount, verticeAnterior, aristaAnterior)}
-    %\STATE pila$<$Vertice$>$ pilaVertices $\leftarrow$ pila vacía
-    %\STATE pilaVertices.push(0) \textcolor{CadetBlue}{// Pusheo un vértice para empezar}
-    %\STATE bool hayCircuito $\leftarrow$ false
-    %\STATE Vertice res $\leftarrow$ -1
-    %\WHILE {(\NOT hayCircuito) \AND ($|$pilaVertices$|$ $>$ 0)}
-        %\STATE Vertice actual $\leftarrow$ pilaVertices.top()
-        %\STATE pilaVertices.pop()
-        %\STATE verticeVisitadoCount$[$actual$]$++
-        %\IF {verticeVisitadoCount$[$actual$]$ == 2}
-            %\STATE hayCircuito $\leftarrow$ true
-            %\STATE res $\leftarrow$ actual
-        %\ELSE
-            %\FOR {\textbf{each} arista del vértice actual}
-                %\STATE Vertice nuevoActual $\leftarrow$ El otro vértice de la arista
-                %\STATE Vertice nuevoAnterior $\leftarrow$ actual
-                %\IF {nuevoActual == verticeAnterior$[$actual$]$}
-                    %\STATE \textcolor{CadetBlue}{// Si estoy acá es porque estaba volviendo por la misma arista que vine (formando un circuito NO simple)}
-                %\ELSE 
-                    %\STATE aristaAnterior$[$nuevoActual$]$ $\leftarrow$ arista
-                    %\STATE verticeAnterior$[$nuevoActual$]$ $\leftarrow$ nuevoAnterior
-                    %\STATE pilaVertices.push(nuevoActual)
-                %\ENDIF
-            %\ENDFOR
-        %\ENDIF
-    %\ENDWHILE
-    %\RETURN res
-%\end{algorithmic}
-%\end{algorithm}
-
-%\begin{algorithm}[H]
-%\begin{algorithmic}[1]
-%\caption{hallarCircuito(verticeVisitado, actual, verticeAnterior, aristaAnterior)}
-%\IF {\NOT verticeVisitado$[$actual$]$}
-    %\STATE verticeVisitado[actual] $\leftarrow$ true
-    %\FOR {\textbf{each} arista del vértice actual}
-        %\STATE Vertice nuevoActual $\leftarrow$ El otro vértice de la arista
-        %\STATE Vertice nuevoAnterior $\leftarrow$ actual
-        %\IF {nuevoActual == verticeAnterior$[$actual$]$}
-            %\STATE \textcolor{CadetBlue}{// Si estoy acá es porque estaba volviendo por la misma arista que vine (formando un circuito NO simple)}
-        %\ELSE
-            %\STATE aristaAnterior$[$nuevoActual$]$ $\leftarrow$ arista
-            %\STATE verticeAnterior$[$nuevoActual$]$ $\leftarrow$ nuevoAnterior
-            %\STATE hallarCircuito(verticeVisitado, nuevoActual, verticeAnterior, aristaAnterior)
-        %\ENDIF
-    %\ENDFOR
-%\ENDIF
-%\end{algorithmic}
-%\end{algorithm}
-
-\textbf{COMPLETAR}
+\begin{algorithm}[H]
+\begin{algorithmic}[1]
+\caption{DFS\_visit(infoVerticeDFS * info, Vertice actual)}
+\STATE info[actual].estado $\leftarrow$ GRIS
+\FOR {\textbf{each} arista del vértice actual}
+    \STATE Vertice nuevoActual $\leftarrow$ arista.dameElOtroVertice(actual)
+    \IF {info[nuevoActual].estado == BLANCO}
+        \STATE info[nuevoActual].aristaAnterior $\leftarrow$ arista
+        \STATE info[nuevoActual].verticeAnterior $\leftarrow$ actual
+        \STATE DFS\_visit(aristasDeCadaVerticeAGM, info, nuevoActual)
+    \ELSIF {info[nuevoActual].estado == GRIS}
+        \IF {nuevoActual == info[actual].verticeAnterior}
+            \STATE \textcolor{CadetBlue}{// Si estoy acá es porque estaba volviendo por la misma arista que vine (formando un circuito NO simple)}
+        \ELSE
+            \STATE \textcolor{CadetBlue}{// El nuevo vertice ya habia sido visitado, entonces hay back edge}
+            \STATE Insertar arista en info[nuevoActual].backEdges
+        \ENDIF
+    \ENDIF
+\ENDFOR
+\STATE info[actual].estado $\leftarrow$ NEGRO
+\end{algorithmic}
+\end{algorithm}
 
 \subsection{Demostración}
 
@@ -181,4 +161,8 @@ Luego, la solución devuelta por nuestro algoritmo es óptima, y el algoritmo es
 
 \subsection{Análisis de complejidad}
 
+\textbf{COMPLETAR}
+
 \subsection{Tests de complejidad}
+
+\textbf{COMPLETAR}
