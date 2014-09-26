@@ -48,23 +48,26 @@ public class Aterrizar {
 		if (inicio.equals(destino)) {
 			return true;
 		}
+		// Aeropuerto.maximoVerde = hora de salida del vuelvo verde que sale mas tarde
 		boolean llego = false;
+		if (inicio.maximoVerde >= t) {
+			llego = true;
+		}
 		for (Vuelo vuelo : inicio.vuelosQueSalen()) {
-			if (vuelo.partida() >= t) {
-				if (vuelo.color().equals(Color.VERDE)) {
-					llego = true;
-				}
-				if (vuelo.color().equals(Color.AMARILLO)) {
+				if (vuelo.color().equals(Color.BLANCO) && vuelo.salida() >= t+2) { 
+					inicio.vuelosQueSalen().remove(vuelo);
 					if (existeVuelo(aeropuertos, vuelo.destino(), destino,
 							vuelo.llegada())) {
 						vuelo.cambiarColor(Color.VERDE);
+						if (vuelo.salida() > inicio.maximoVerde) {
+							inicio.maximoVerde = vuelo.salida();
+						}
 						llego = true;
 					} else {
 						vuelo.cambiarColor(Color.ROJO);
 					}
 				}
 			}
-		}
 		return llego;
 	}
 }
