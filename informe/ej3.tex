@@ -177,7 +177,7 @@ std::list<Arista> aristasAnillo;
 
 Empecemos analizando los contenedores que usamos, ya que son clave para el cálculo de complejidad de peor caso. El grafo se define en \textbf{aristasDeCadaVertice}, que es un vector de listas de aristas. El i-ésimo elemento corresponde al i-ésimo vértice, y su lista son las aristas que inciden en él. En \textbf{aristasDeCadaVerticeAGM} se construirá la solución. En \textbf{aristasGrafo}, que es un conjunto ordenado de aristas (compara usando \emph{comparacionArista}, que ordena cada arista pesada (v,w,c) --con v,w vértices y c su peso--, primero por costo, y si son iguales, ordena por vértices, teniendo en cuenta el caso en que $e = (v,w,c)$ y $e' = (w,v,c)$, ya que $e = e'$), se hallarán las aristas originales del grafo input, y se usarán los conjuntos ordenados \textbf{aristasAGM} para guardar las aristas de la solución y \textbf{aristasCandidatasAGM} para guardar las aristas candidatas que procesará el algoritmo de Prim. De la misma manera, el conjunto ordenado \textbf{verticesAGM} será usado por Prim para mantener el registro de los vértices que están en el árbol generador parcial. Por último, \textbf{aristasAnillo} es una lista de aristas que usaremos al final para guardar las aristas del único circuito simple de la solución.
 
-Cuando comienza el algoritmo, se completan \textbf{aristasDeCadaVerticeAGM} y \textbf{aristasGrafo}, lo cual en el peor caso ($m = n (n - 1)$, esto es, un grafo completo) cuesta
+Cuando comienza el algoritmo, se completan \textbf{aristasDeCadaVerticeAGM} y \textbf{aristasGrafo}, lo cual en el peor caso ($m = \frac{n (n - 1)}{2}$, esto es, un grafo completo) cuesta
 \begin{align*}
 T(n) &= O(m) + O\left(\sum\limits_{\substack{i = 1}}^m \log i\right) \\
 T(n) &= O(m) + O(\log m!) \\
@@ -222,4 +222,13 @@ lo cual es estrictamente mejor que $O(n^3)$.
 
 \subsection{Tests de complejidad}
 
-\textbf{COMPLETAR}
+Para testear la complejidad de peor caso, construimos 100 instancias aleatorias de grafos completos de $n$ vértices, para $n = {1, ... , 100}$ y calculamos el tiempo de ejecución 10 veces para cada instancia, tomando el mínimo. Luego, promediamos los tiempos de las 100 instancias para cada $n$. Finalmente, como afirmamos que la complejidad es $O(n^2 \log n)$, dividimos la muestra por $n \log n$ y esperamos ver una recta, lo cual efectivamente ocurre, como se aprecia a continuación:
+
+\begin{figure}[H]
+	\begin{minipage}[t]{\linewidth}
+		\centering
+		\includegraphics[width=\textwidth]{p3_complejidad.jpg}
+		%\caption{}
+		\label{fig:p3_complejidad}
+	\end{minipage}
+\end{figure}

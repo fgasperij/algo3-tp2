@@ -1,3 +1,5 @@
+#include <chrono>
+#include <climits>
 #include <iostream>
 #include <list>
 #include <vector>
@@ -98,46 +100,15 @@ void DFS_visit(vector< list<Arista> > & aristasDeCadaVerticeAGM, infoVerticeDFS 
     info[actual].estado = NEGRO;
 }
 
-int main(int argc, const char* argv[]) {
-    unsigned int n, m, costoTotal = 0;                          // n = #vertices, m = #aristas
-    vector< list<Arista> > aristasDeCadaVertice;                // aristasDeCadaVertice[i] es la lista de las aristas del vértice i
-    vector< list<Arista> > aristasDeCadaVerticeAGM;
-    set<Arista, comparacionArista> aristasGrafo;
-    set<Vertice> verticesAGM;                                   // conjunto con los vertices ya puestos en el AGM parcial
-    set<Arista, comparacionArista> aristasAGM;                  // conjunto con las aristas ya puestas en el AGM parcial
-    set<Arista, comparacionArista> aristasCandidatasAGM;        // conjunto de las aristas candidatas para el AGM en un momento dado
-    list<Arista> aristasAnillo;
-    
-    cin >> n >> m;
-    
-    if (m < n) {                                                // Si hay menos de n aristas, no existe solución (ver Correctitud)
-        cout << "no" << endl;
-        return 0;
-    }
-    
-    for (unsigned int i = 0; i < n; i++) {
-        aristasDeCadaVertice.push_back(list<Arista>());
-        aristasDeCadaVerticeAGM.push_back(list<Arista>());
-    }
-    
-    for (unsigned int i = 0; i < m; i++) {
-        Vertice v1, v2;
-        int l;
-        cin >> v1 >> v2 >> l;
-        v1--; v2--; // Como los equipos van de 1 a n, resto uno para que v1 y v2 vayan de 0 a n-1. Al devolver la solución sumo 1 y listo
-        Arista a(v1, v2, l);
-        aristasDeCadaVertice[v1].push_back(a);
-        aristasDeCadaVertice[v2].push_back(a);
-        aristasGrafo.insert(a); // costo total O(m log m) que en el peor caso es O(n²log n²) = O(n² log n) porque log(n²) = 2 log(n)
-    }
-    
+chrono::microseconds algoritmo(unsigned int n, unsigned int m, unsigned int costoTotal, vector< list<Arista> > aristasDeCadaVertice, vector< list<Arista> > aristasDeCadaVerticeAGM, set<Arista, comparacionArista> aristasGrafo, set<Vertice> verticesAGM, set<Arista, comparacionArista> aristasAGM, set<Arista, comparacionArista> aristasCandidatasAGM, list<Arista> aristasAnillo) 
+{
+    auto start_time = chrono::high_resolution_clock::now();
     // Arranco poniendo el vértice 0 en verticesAGM, y sus aristas en aristasCandidatasAGM
     verticesAGM.insert(0);
     for(auto it = aristasDeCadaVertice[0].begin(); it != aristasDeCadaVertice[0].end(); it++) {
         aristasCandidatasAGM.insert(*it);
     }
     
-    // En el ciclo se consideran todas las aristas, entonces insertarlas en el conjunto aristasCandidatasAGM cuesta O(log 1 + ... + log m) = O(log m!) = O(m log m). Además, para cada arista se hacen O(log n) operaciones en el peor caso, entonces el costo total de peor caso (esto es, m = n(n-1)/2) del ciclo es O(m log m) + O(m log n) = O(n² log n²) + O(n² log n) = O(n² 2 log n) + O(n² log n) = O(n² log n) + O(n² log n) = O(n² log n) que es estrictamente mejor que O(n³).
     while (aristasAGM.size() < n - 1 && aristasCandidatasAGM.size() > 0 ) { // set::size() es O(1)
         auto iterAristaMinima = aristasCandidatasAGM.begin();
         Arista a = *iterAristaMinima;
@@ -162,48 +133,89 @@ int main(int argc, const char* argv[]) {
         }
     }
     
-    if (aristasAGM.size() < n - 1) {    // Si el árbol no tiene n - 1 aristas, no es generador (el grafo original no era conexo)
-        cout << "no" << endl;
-        return 0;
+    if ( (aristasAGM.size() < n - 1) || (aristasGrafo.size() == 0)) {
+        // No hay solucion
+    } else {
+        Arista menor = *aristasGrafo.begin();
+        aristasAGM.insert(menor);
+        for (auto it = aristasAGM.begin(); it != aristasAGM.end(); it++) {
+            costoTotal += it->costo();
+        }
+        Vertice primero = menor.dameVerticeUno();
+        Vertice segundo = menor.dameVerticeDos();
+        aristasDeCadaVerticeAGM[primero].push_back(menor);
+        aristasDeCadaVerticeAGM[segundo].push_back(menor);
+        // Tengo que encontrar el circuito simple, esto es, el anillo
+        infoVerticeDFS info[n];
+        DFS_visit(aristasDeCadaVerticeAGM, info, primero); // Llamo a DFS con un vértice que sé que está en el ciclo
+        if (info[primero].backEdges.size() != 1) {
+            cout << "Hay algo mal, el vertice deberia tener exactamente un back edge." << endl;
+        }
+        Arista backEdge = info[primero].backEdges.front();
+        aristasAnillo.push_back(backEdge);
+        aristasAGM.erase(backEdge);
+        Vertice actual = backEdge.dameElOtroVertice(primero);
+        while (actual != primero) {
+            aristasAGM.erase(info[actual].aristaAnterior);               // En aristasAGM van a quedar las aristas fuera del circuito
+            aristasAnillo.push_back(info[actual].aristaAnterior);        // Lo contrario para aristasAnillo
+            actual = info[actual].verticeAnterior;
+        }
     }
     
-    // Ahora agrego la arista con menor peso:
-    if (aristasGrafo.size() == 0) {     // En aristasGrafo quedaron las aristas que no puse en el AGM
-        cout << "no" << endl;
-        return 0;
+    auto end_time = chrono::high_resolution_clock::now();
+    chrono::microseconds tiempo = chrono::duration_cast<chrono::microseconds>(end_time - start_time);
+    return tiempo;
+}
+
+const int CANT_INSTANCIAS = 100;
+const int MAX_VERTICES = 100;
+const int CANT_REPETICIONES_CALCULO_INSTANCIA = 10;
+
+int main(int argc, const char* argv[]) {
+    for (int cantVertices = 1; cantVertices <= MAX_VERTICES; cantVertices++) {
+        int promedio = 0;
+        for (int instancia = 1; instancia <= CANT_INSTANCIAS; instancia++) {
+            unsigned int n, m, costoTotal = 0;
+            vector< list<Arista> > aristasDeCadaVertice;
+            vector< list<Arista> > aristasDeCadaVerticeAGM;
+            set<Arista, comparacionArista> aristasGrafo;
+            set<Vertice> verticesAGM;
+            set<Arista, comparacionArista> aristasAGM;
+            set<Arista, comparacionArista> aristasCandidatasAGM;
+            list<Arista> aristasAnillo;
+            
+            cin >> n >> m;
+            
+            for (unsigned int i = 0; i < n; i++) {
+                aristasDeCadaVertice.push_back(list<Arista>());
+                aristasDeCadaVerticeAGM.push_back(list<Arista>());
+            }
+            
+            for (unsigned int i = 0; i < m; i++) {
+                Vertice v1, v2;
+                int l;
+                cin >> v1 >> v2 >> l;
+                v1--; v2--;
+                Arista a(v1, v2, l);
+                aristasDeCadaVertice[v1].push_back(a);
+                aristasDeCadaVertice[v2].push_back(a);
+                aristasGrafo.insert(a);
+            }
+            
+            chrono::microseconds minTiempo(INT_MAX);
+            for (int rep = 1; rep <= CANT_REPETICIONES_CALCULO_INSTANCIA; rep++) {
+                // Notar que todo se pasa por copia para que no se modifique.
+                chrono::microseconds tiempoRep = algoritmo(n, m, costoTotal, aristasDeCadaVertice, aristasDeCadaVerticeAGM, aristasGrafo, verticesAGM,aristasAGM, aristasCandidatasAGM, aristasAnillo);
+                if (tiempoRep < minTiempo)
+                    minTiempo = tiempoRep;
+            }
+            
+            promedio += minTiempo.count();
+        }
+        promedio = promedio / CANT_INSTANCIAS;
+        cout << cantVertices << " " << promedio << endl;
     }
-    Arista menor = *aristasGrafo.begin();
-    aristasAGM.insert(menor);
-    for (auto it = aristasAGM.begin(); it != aristasAGM.end(); it++) {
-        costoTotal += it->costo();
-    }
-    Vertice primero = menor.dameVerticeUno();
-    Vertice segundo = menor.dameVerticeDos();
-    aristasDeCadaVerticeAGM[primero].push_back(menor);
-    aristasDeCadaVerticeAGM[segundo].push_back(menor);
-    // Tengo que encontrar el circuito simple, esto es, el anillo
-    infoVerticeDFS info[n];
-    DFS_visit(aristasDeCadaVerticeAGM, info, primero); // Llamo a DFS con un vértice que sé que está en el ciclo
-    if (info[primero].backEdges.size() != 1) {
-        cout << "Hay algo mal, el vertice deberia tener exactamente un back edge." << endl;
-        return 1;
-    }
-    Arista backEdge = info[primero].backEdges.front();
-    aristasAnillo.push_back(backEdge);
-    aristasAGM.erase(backEdge);
-    Vertice actual = backEdge.dameElOtroVertice(primero);
-    while (actual != primero) {
-        aristasAGM.erase(info[actual].aristaAnterior);               // En aristasAGM van a quedar las aristas fuera del circuito
-        aristasAnillo.push_back(info[actual].aristaAnterior);        // Lo contrario para aristasAnillo
-        actual = info[actual].verticeAnterior;
-    }
-    cout << costoTotal << " " << aristasAnillo.size() << " " << aristasAGM.size() << endl;
-    for (auto it = aristasAnillo.begin(); it != aristasAnillo.end(); it++) {
-        cout << it->dameVerticeUno() + 1 << " " << it->dameVerticeDos() + 1 << endl;
-    }
-    for (auto it = aristasAGM.begin(); it != aristasAGM.end(); it++) {
-        cout << it->dameVerticeUno() + 1 << " " << it->dameVerticeDos() + 1 << endl;
-    }
+    
     
     return 0;
 }
