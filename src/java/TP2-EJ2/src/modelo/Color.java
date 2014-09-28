@@ -2,6 +2,6 @@ package modelo;
 
 public enum Color {
 
-	AMARILLO, ROJO, VERDE;
+	AMARILLO, ROJO, VERDE, BLANCO;
 
 }

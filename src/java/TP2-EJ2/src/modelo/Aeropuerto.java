@@ -1,7 +1,10 @@
 package modelo;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class Aeropuerto {
 
@@ -12,7 +15,25 @@ public class Aeropuerto {
 		this.id = i;
 	}
 
+	private int ultimoVueloQueLlega = -1;
+
+	public int obtenerUltimoVueloQueLlega() {
+		return ultimoVueloQueLlega;
+	}
+
+	public void cambiarUltimoVueloQueLlega(Vuelo ultimoVueloQueLlega) {
+		this.ultimoVueloQueLlega = ultimoVueloQueLlega.llegada();
+	}
+
+	private Vuelo primero_en_llegar;
+
 	private String ciudad;
+
+	private List<Vuelo> vuelosQueLlegaronAdestino = new LinkedList<Vuelo>();
+
+	public void agregarAvuelosQueLleganAdestino(Vuelo vuelo) {
+		vuelosQueLlegaronAdestino.add(vuelo);
+	}
 
 	private List<Vuelo> vuelosQueLlegan = new ArrayList<Vuelo>();
 
@@ -58,6 +79,32 @@ public class Aeropuerto {
 
 	public void agregarAvuelosQueLlegan(Vuelo vuelo) {
 		vuelosQueLlegan.add(vuelo);
+	}
+
+	public Vuelo primeroEnLlegar() {
+		return primero_en_llegar;
+	}
+
+	public void agregarPrimeroEnLlegar(Vuelo vuelo) {
+		primero_en_llegar = vuelo;
+	}
+
+	public void vaciarVuelosQueSalen() {
+		vuelosQueSalen = new ArrayList<Vuelo>();
+	}
+
+	public void vaciarVuelosQueLlegan() {
+		vuelosQueLlegan = new ArrayList<Vuelo>();
+	}
+
+	boolean yaLoCalcule = false;
+
+	public boolean yaLoCalcule() {
+		return yaLoCalcule;
+	}
+
+	public void loCalcule() {
+		yaLoCalcule = true;
 	}
 
 }
