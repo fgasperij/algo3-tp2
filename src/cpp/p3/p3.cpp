@@ -142,14 +142,14 @@ int main(int argc, const char* argv[]) {
         auto iterAristaMinima = aristasCandidatasAGM.begin();
         Arista a = *iterAristaMinima;
         aristasCandidatasAGM.erase(iterAristaMinima);           // Saco la arista del pool de candidatas, costo amortizado constante
-        pair<bool,Vertice> infoIncidencia = a.incideEnDosVertices(verticesAGM); // costo O(log |V(T)|)
+        pair<bool,Vertice> infoIncidencia = a.incideEnDosVertices(verticesAGM); // costo O(log |verticesAGM|)
         if (infoIncidencia.first) {                             // Si incide en 2 vertices, no la puedo usar
             continue;
         } else {
             Vertice nuevo = infoIncidencia.second;              // Este es el vértice en el que no incide, no está en AGM
-            verticesAGM.insert(nuevo);                          // costo O(log |V(T)|)
-            aristasGrafo.erase(a);                              // Saco del grafo la arista que voy a poner en el AGM, costo amort. cte.
-            aristasAGM.insert(a);                               // costo O(log |V(T)|) porque un árbol tiene m = n - 1
+            verticesAGM.insert(nuevo);                          // costo O(log |verticesAGM|)
+            aristasGrafo.erase(a);                              // Saco del grafo la arista, costo O(log |aristasGrafo|)
+            aristasAGM.insert(a);                               // costo O(log |verticesAGM|) porque un árbol tiene m = n - 1
             Vertice otro = a.dameElOtroVertice(nuevo);
             aristasDeCadaVerticeAGM[nuevo].push_back(a);        // costo O(1)
             aristasDeCadaVerticeAGM[otro].push_back(a);

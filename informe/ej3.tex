@@ -97,7 +97,7 @@ Al finalizar el algoritmo, las aristas del circuito de la solución óptima qued
     \IF {info[nuevoActual].estado == BLANCO}
         \STATE info[nuevoActual].aristaAnterior $\leftarrow$ arista
         \STATE info[nuevoActual].verticeAnterior $\leftarrow$ actual
-        \STATE DFS\_visit(aristasDeCadaVerticeAGM, info, nuevoActual)
+        \STATE DFS\_visit(info, nuevoActual)
     \ELSIF {info[nuevoActual].estado == GRIS}
         \IF {nuevoActual == info[actual].verticeAnterior}
             \STATE \textcolor{CadetBlue}{// Si estoy acá es porque estaba volviendo por la misma arista que vine (formando un circuito NO simple)}
@@ -159,9 +159,65 @@ Por lo tanto, el circuito de $S'$ está en $S - \left\{e\right\}$. Pero entonces
 Luego, la solución devuelta por nuestro algoritmo es óptima, y el algoritmo es correcto.
 \end{proof}
 
+\newpage
+
 \subsection{Análisis de complejidad}
 
-\textbf{COMPLETAR}
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[basicstyle=\normalsize\ttfamily, frame=single]
+std::vector< list<Arista> > aristasDeCadaVertice;
+std::vector< list<Arista> > aristasDeCadaVerticeAGM;
+std::set<Arista, comparacionArista> aristasGrafo;
+std::set<Vertice> verticesAGM;
+std::set<Arista, comparacionArista> aristasAGM;
+std::set<Arista, comparacionArista> aristasCandidatasAGM;
+std::list<Arista> aristasAnillo;
+\end{lstlisting}
+\end{minipage}
+
+Empecemos analizando los contenedores que usamos, ya que son clave para el cálculo de complejidad de peor caso. El grafo se define en \textbf{aristasDeCadaVertice}, que es un vector de listas de aristas. El i-ésimo elemento corresponde al i-ésimo vértice, y su lista son las aristas que inciden en él. En \textbf{aristasDeCadaVerticeAGM} se construirá la solución. En \textbf{aristasGrafo}, que es un conjunto ordenado de aristas (compara usando \emph{comparacionArista}, que ordena cada arista pesada (v,w,c) --con v,w vértices y c su peso--, primero por costo, y si son iguales, ordena por vértices, teniendo en cuenta el caso en que $e = (v,w,c)$ y $e' = (w,v,c)$, ya que $e = e'$), se hallarán las aristas originales del grafo input, y se usarán los conjuntos ordenados \textbf{aristasAGM} para guardar las aristas de la solución y \textbf{aristasCandidatasAGM} para guardar las aristas candidatas que procesará el algoritmo de Prim. De la misma manera, el conjunto ordenado \textbf{verticesAGM} será usado por Prim para mantener el registro de los vértices que están en el árbol generador parcial. Por último, \textbf{aristasAnillo} es una lista de aristas que usaremos al final para guardar las aristas del único circuito simple de la solución.
+
+Cuando comienza el algoritmo, se completan \textbf{aristasDeCadaVerticeAGM} y \textbf{aristasGrafo}, lo cual en el peor caso ($m = n (n - 1)$, esto es, un grafo completo) cuesta
+\begin{align*}
+T(n) &= O(m) + O\left(\sum\limits_{\substack{i = 1}}^m \log i\right) \\
+T(n) &= O(m) + O(\log m!) \\
+T(n) &= O(m) + O(m \log m) \\
+T(n) &= O(n^2 \log n^2) \\
+T(n) &= O(n^2 \log n)
+\end{align*}
+pues $\log k! = k \log(k) - k + O(\log k)$ por la aproximación de Stirling del factorial.
+
+Se empieza poniendo el \emph{vértice 0} en \textbf{verticesAGM} y sus aristas en \textbf{aristasCandidatasAGM}. Insertar en \textbf{std::set} cuesta $\log |conjunto|$, entonces en el peor caso hasta ahora tenemos 
+\begin{align*}
+T(n) &= O(n^2 \log n) + O(\log 1) + O\left(\sum\limits_{\substack{i = 1}}^{n-1} \log i\right) \\
+T(n) &= O(n^2 \log n) + O(\log n!) \\
+T(n) &= O(n^2 \log n) + O(n \log n) \\
+T(n) &= O(n^2 \log n)
+\end{align*}
+
+El algoritmo de Prim es un ciclo que termina cuando ya no hay más aristas candidatas, o cuando ya tenemos $n - 1$ en la solución. El algoritmo va a considerar todas las aristas, lo que implica que van a hacerse $m$ inserciones, y a lo sumo $n-1$ eliminaciones de aristas en \textbf{aristasCandidatasAGM}. En cada iteración se toma la arista candidata de menor costo, lo cual cuesta $O(1)$, se la elimina en $O(\log |aristasCandidatasAGM|) = O(\log m)$ de \textbf{aristasCandidatasAGM}, se chequea si incide en dos vértices del árbol parcial en $O(\log |verticesAGM|)$, y si no incide, se inserta el vértice nuevo en \textbf{verticesAGM} lo cual cuesta $O(\log |verticesAGM|)$, se elimina la arista de \textbf{aristasGrafo} en $O(\log |aristasGrafo|)$, se inserta la misma en \textbf{aristasAGM} en $O(\log |aristasAGM|)$ y en las listas de \textbf{aristasDeCadaVerticeAGM} de sus vértices incidentes en $O(1)$; luego, para cada una de las aristas del vértice nuevo se chequea si inciden en dos vértices (ya que si lo hacen, estaría poniendo como candidata una arista que ya consideré) en $O(\log |verticesAGM|)$, y en caso contrario la agrego en \textbf{aristasCandidatasAGM} en $O(\log |aristasCandidatasAGM|)$.
+
+\noindent Entonces, podemos afirmar que:
+\begin{itemize}
+\item Por cada arista va a llamarse a lo sumo tres veces a la función $incideEnDosVertices$: primero al intentar agregarla a las candidatas (lo cual pasa dos veces porque dos vértices la tienen en su lista), y después cuando efectivamente se considera añadirla al árbol. El costo total lo podemos acotar por $O(m \log n)$ que es $O(n^2 \log n)$ en el peor caso.
+\item Se insertan a lo sumo $n$ vértices en \textbf{verticesAGM}, lo cual en total cuesta $O(n \log n)$.
+\item En \textbf{aristasCandidatasAGM}, se insertan $m$ aristas y se eliminan a lo sumo $n-1$. Esto lo podemos acotar por $O(\log m!) + O((n-1)\log m) = O(m \log m) + O(n \log m)$, que en el peor caso es $O(n^2 \log n^2) + O(n \log n^2) = O(n^2 \log n)$.
+\item Se eliminan a lo sumo $n - 1$ aristas de \textbf{aristasGrafo}, lo cual en total podemos acotar por $O(n \log m) = O(n \log n^2) = O(n \log n)$.
+\item Se insertan a lo sumo $n - 1$ aristas en \textbf{aristasAGM}, lo cual podemos acotar por $O(\log n!) = O(n \log n)$.
+\item En \textbf{aristasDeCadaVerticeAGM}, se hacen a lo sumo $2(n-1)$ inserciones, lo cual en total cuesta $O(n)$.
+\end{itemize}
+Por lo tanto, el algoritmo de Prim cuesta en el peor caso $O(n^2 \log n)$. Veamos qué ocurre con el resto del algoritmo.
+
+Ya tenemos armado el árbol generador mínimo. Lo que hacemos ahora es pedir en $O(1)$ la arista de menor costo en \textbf{aristasGrafo}, ya que ahí quedaron todas las aristas que no fueron insertadas en el AGM, y la agregamos en \textbf{aristasAGM} en $O(\log n)$. Calcular el precio total de la solución es simplemente iterar con un acumulador sobre \textbf{aristasAGM}, lo cual cuesta $O(n)$.
+
+Sólo queda identificar el \emph{anillo}, es decir, el único circuito simple de la solución. Para ello, se llama a \emph{DFS\_visit} con uno de los vértices de la arista añadida al final. Esta función hace un recorrido DFS sobre el subgrafo solución e identifica el \emph{back edge}, y como visita a cada vértice una sóla vez (y añadir el back edge cuesta $O(1)$) el costo total de ejecutar DFS es $O(n + m)$\cite[p.~606]{cormen}, y como $m = n$, es $O(n + n) = O(n)$. El costo de diferenciar al ciclo de las demás aristas de la solución es entonces insertar las aristas del circuito en la lista \textbf{aristasAnillo}, lo cual cuesta $O(n)$ en el peor caso, y de eliminar estas aristas de \textbf{aristasAGM} lo cual cuesta $O(\log n!) = O(n \log n)$ en el peor caso. En total, todo este paso lleva $O(n \log n)$.
+
+Luego, la complejidad temporal de peor caso del algoritmo es 
+\begin{align*}
+T(n) &= O(n^2 \log n) + O(n^2 \log n) + O(n) + O(n \log n) \\
+T(n) &= O(n^2 \log n)
+\end{align*}
+lo cual es estrictamente mejor que $O(n^3)$.
 
 \subsection{Tests de complejidad}
 
