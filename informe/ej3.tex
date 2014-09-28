@@ -183,6 +183,7 @@ T(n) &= O(m) + O\left(\sum\limits_{\substack{i = 1}}^m \log i\right) \\
 T(n) &= O(m) + O(\log m!) \\
 T(n) &= O(m) + O(m \log m) \\
 T(n) &= O(n^2 \log n^2) \\
+T(n) &= O(n^2 2\log n) \\
 T(n) &= O(n^2 \log n)
 \end{align*}
 pues $\log k! = k \log(k) - k + O(\log k)$ por la aproximación de Stirling del factorial.
@@ -210,7 +211,7 @@ Por lo tanto, el algoritmo de Prim cuesta en el peor caso $O(n^2 \log n)$. Veamo
 
 Ya tenemos armado el árbol generador mínimo. Lo que hacemos ahora es pedir en $O(1)$ la arista de menor costo en \textbf{aristasGrafo}, ya que ahí quedaron todas las aristas que no fueron insertadas en el AGM, y la agregamos en \textbf{aristasAGM} en $O(\log n)$. Calcular el precio total de la solución es simplemente iterar con un acumulador sobre \textbf{aristasAGM}, lo cual cuesta $O(n)$.
 
-Sólo queda identificar el \emph{anillo}, es decir, el único circuito simple de la solución. Para ello, se llama a \emph{DFS\_visit} con uno de los vértices de la arista añadida al final. Esta función hace un recorrido DFS sobre el subgrafo solución e identifica el \emph{back edge}, y como visita a cada vértice una sóla vez (y añadir el back edge cuesta $O(1)$) el costo total de ejecutar DFS es $O(n + m)$\cite[p.~606]{cormen}, y como $m = n$, es $O(n + n) = O(n)$. El costo de diferenciar al ciclo de las demás aristas de la solución es entonces insertar las aristas del circuito en la lista \textbf{aristasAnillo}, lo cual cuesta $O(n)$ en el peor caso, y de eliminar estas aristas de \textbf{aristasAGM} lo cual cuesta $O(\log n!) = O(n \log n)$ en el peor caso. En total, todo este paso lleva $O(n \log n)$.
+Sólo queda identificar el \emph{anillo}, es decir, el único circuito simple de la solución. Para ello, se llama a \emph{DFS\_visit} con uno de los vértices de la arista añadida al final. Esta función hace un recorrido DFS sobre el subgrafo solución e identifica el \emph{back edge}, y como visita a cada vértice una sóla vez, considerando para cada uno sus aristas (y añadir el back edge cuesta $O(1)$) el costo total de ejecutar DFS es $O(n + m)$\cite[p.~606]{cormen}, y como $m = n$, es $O(n + n) = O(n)$. El costo de diferenciar al ciclo de las demás aristas de la solución es entonces insertar las aristas del circuito en la lista \textbf{aristasAnillo}, lo cual cuesta $O(n)$ en el peor caso, y de eliminar estas aristas de \textbf{aristasAGM} lo cual cuesta $O(\log n!) = O(n \log n)$ en el peor caso. En total, todo este paso lleva $O(n \log n)$.
 
 Luego, la complejidad temporal de peor caso del algoritmo es 
 \begin{align*}
