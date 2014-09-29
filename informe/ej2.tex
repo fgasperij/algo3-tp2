@@ -120,20 +120,34 @@ igual a $SP_{v}^{opt}$. Por último, recorre todos los nodos y toma el mínimo e
 lo cual es precisamente la solución que acabamos de definir.
 
 \subsection{Análisis de complejidad}
-No es necesario construir el grafo explícitamente ya que los saltos de caballo desde una casilla pueden contruirse 
-ad hoc, por lo tanto, dada un nodo, casilla, obtener los vecinos del mismo tiene costo $O(1)$ porque a lo sumo
-puede contar con 8 vecinos:
+El algoritmo tiene 3 partes importantes a considerar con respecto a su complejidad:
+\begin{enumerate}
+  \item generar el grafo que modela la instancia del problema
+  \item aplicar BFS una vez por cada caballo con el nodo correspondiente al caballo como origen
+  \item buscar el nodo que cuente con la suma mínima
+\end{enumerate}
+Generar el grafo que modela la instancia del problema recibida tiene costo $O(\left\vert{V}\right\vert) = O(n^2)$. 
+Sólo precisamos una matriz de tamaño $n \times n$. Cada posición representa a un nodo y en él almacenaremos la suma
+de los caminos mínimos desde cada uno de los caballos hasta él. No es necesario guardar información acerca de las
+aristas del grafo porque, al ser el salto de del caballo un movimiento conocido, dado un nodo se pueden obtener sus vecinos
+en tiempo constante $O(1)$ calculándolos \textit{ad hoc}:
+\begin{center}
 (TODO insertar imagen de un tablero con una C en el centro, otra en un rincón y otra en una banda, indicando en cada
 caso los saltos posibles)
-
-\subsection{Tests de complejidad}
-
-
-\subsection{Análisis de complejidad}
-No es necesario construir el grafo explícitamente ya que los saltos de caballo desde una casilla pueden contruirse 
-ad hoc, por lo tanto, dada un nodo, casilla, obtener los vecinos del mismo tiene costo $O(1)$ porque a lo sumo
-puede contar con 8 vecinos:
-(TODO insertar imagen de un tablero con una C en el centro, otra en un rincón y otra en una banda, indicando en cada
-caso los saltos posibles)
+\end{center}
+Tampoco es necesario guardar la distancia desde cada origen hasta cada uno de los nodos ya que sólo nos interesará
+la suma total sobre cada nodo. Por lo tanto, basta con ir sumando la distancia de cada uno de los orígenes hasta él.\\
+El costo de aplicar BFS es $O(\left\vert{E}\right\vert) = O(n^2 * 8) = O(n^2)$ (TODO agregar cita al cormen) porque, 
+como ya vimos, la cantidad de aristas del grafo está acotada por la cantidad de nodos, porque el caballo a lo sumo
+puede saltar a 8 casillas diferentes.\\
+Por último, buscar el mínimo tiene un costo $O(\left\vert{V}\right\vert) = O(n^2)$ porque simplemente consiste
+en iterar por todos los nodos y quedarse con el que tenga la suma mínima.\\
+Por lo tanto, la complejidad está dada por:
+\begin{displaymath}
+  O(construir\_grafo) + \#caballos * O(BFS) + O(obtener\_minimo) = 
+\end{displaymath}
+\begin{displaymath}
+  O(n^2) + k * O(n^2) + O(n^2) = O(k * n^2)
+\end{displaymath}
 
 \subsection{Tests de complejidad}
