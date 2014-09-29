@@ -373,6 +373,7 @@ Como mi vuelo pertenecia a un camino verde, existe al menos un vuelo que sale de
 Luego la sucesi\'on de vuelos obtenida de esta manera desde la ciudad final, comenzando con T = $\infty$ es una soluci\'on a nuestro problema ya que va desde a hasta b, y el \'ultimo vuelo de esa sucesi\'on es el de menor horario de aterrizaje en b, de los vuelos que llegan desde a hasta b por un camino verde.
 
 \subsection{Demostración}
+\newpage
 
 \subsection{Análisis de complejidad}
 Nuestra implementaci\'on consta de dos partes:
@@ -381,19 +382,36 @@ Nuestra implementaci\'on consta de dos partes:
 
 2. Encontrar el conjunto de vuelos validos desde la ciudad origen hasta la destino.
 
-Para construir el array de aeropuertos, lo que hacemos es contar la cantidad de ciudades para crear un array de ese tamaño.
-Para ello, cargamos la ciudad en un TreeSet, como la cantidad de ciudades la podemos acotar por la cantidad de vuelos, ya que a lo sumo tenemos 2 ciudades por vuelo, sea N la cantidad de vuelos, la cantidad de ciudades maximas es de 2.N, por lo tanto el costo de crear este Set es a lo sumo O(n.Log(n))
+Para construir el array de aeropuertos, lo que se hace es contar la cantidad de ciudades para crear un array de ese tamaño.
+Para ello, se carga cada ciudad en un TreeSet. Como la cantidad de ciudades la podemos acotar por la cantidad de vuelos, ya que a lo sumo tenemos 2 ciudades por vuelo, sea N la cantidad de vuelos, la cantidad de ciudades maximas es de 2.N, por lo tanto el costo de crear este Set es a lo sumo O(n.Log(n))
 
 Crear el array tiene una complejidad temporal de O(N) a lo sumo y espacial de 2.N.
 
-Luego debemos asociarles un id a estas ciudades, que va a ser la posicion donde se van a encontrar en el array. Para poder asociarle este id construimos un mapa $\langle Ciudad,ID \rangle$.
+Luego se le asocia un id a estas ciudades, que va a ser la posicion donde se van a encontrar en el array. Para poder asociarle este id se construye un mapa $\langle Ciudad,ID \rangle$.
 Buscar en este mapa nos va a costar O(Log(N)).
 
-Luego asociamos cada vuelo a la poscion donde se encuentran la ciudad destino e inicio de ese vuelo.
-Para ello debemos buscar el id en nuestro mapa. Entonces para asociar todos los vuelos tenemos una complejidad de O(n.Log(n)).
+Luego se asocio cada vuelo a la posicion donde se encuentran la ciudad destino e inicio de ese vuelo.
+Para ello se busca el id en el mapa. Entonces para asociar todos los vuelos tenemos la complejidad es de O(n.Log(n)).
 
-Luego la complejidad final de construir nuestro array es O(n.Log(n)).
+Luego la complejidad final de construir el array es O(n.Log(n)).
 
-Para la funci\'on de recursi\'on vamos a evaluar cuantas iteraciones hay por cada recursi\'on que hacemos.
+Sea i cualquier instancia de recursion de el algoritmo.
+
+Se puede asegurar que los vuelos de la ciudad inicio en i, no van a estar incluidos en cualquier recursion a partir de i. Es decir, no existen ciclos en la recursion, donde un ciclo seria volver a recursar sobre un vuelo que de una iteracion anterior.
+
+Por lo tanto para cualquier recursion a partir de i, se chequean a lo sumo todos los vuelos exactamente una vez.
+
+Cuando se genera una llamada recursiva se colorea el vuelo, por lo tanto ese vuelo nunca mas va a ser llamada recursivamente ya que se conoce el estado para cualquer instante de tiempo.
+
+Por lo tanto el algoritmo puedo tener tantas llamadas recursivas como vuelos distintos tenga.
+El numero de vuelos distintos es N.
+
+Y para cada llamada recursiva a lo sumo puedo iterar por todos los vuelos de una ciudad, los cuales estan acotados por N.
+
+Por lo tanto la cantidad total de vuelos que se iteran dado que se llego a una ciudad, en un instante T esta acotado por la cantida total de llamadas recursivas y la cantidad de vuelos que a lo sumo se iteran en cada una. Por lo tanto la cantidad de iteraciones que se realizan tiene una complejidad menor a O($N^{2})$.
+
+
+
+
 
 \subsection{Tests de complejidad}
