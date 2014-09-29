@@ -145,11 +145,13 @@ Nuestro algoritmo final quedaria de la siguiente manera:
 
 Definimos Color como un enum $[$BLANCO,ROJO,VERDE$]$
 
-Definimos un Aeropuerto como un tupla $\langle$ ciudad$:$Ciudad,vuelosQueSalen$:
-$Conj(Vuelo),
+Definimos un Aeropuerto como un tupla 
 
-vuelosQueLlegan$:$Conj(Vuelo),id$:$Nat $\rangle$ 
-
+\begin{align*}
+\langle ciudad:Ciudad,vuelosQueSalen:
+Conj(Vuelo),vuelosQueLlegan:Conj(Vuelo),\\
+id:Nat,primerVueloQueSaleYLlega:Vuelo,ultimoVueloQuellega:Nat \rangle 
+\end{align*}
 
 \begin{algorithm}[H]
 \begin{algorithmic}[1]
@@ -159,10 +161,10 @@ vuelosQueLlegan$:$Conj(Vuelo),id$:$Nat $\rangle$
 $/*$ Esta sesgada la funcion con T $=$ -2 ya que vamos a preguntar si existeVuelo a partir de T $=$ 0.
 En la posicion 0 se encuentra el aeropuerto de la ciudad inicial, y en la posici\'on 1, el de la ciudad final $*/$
 \IF{(existeVuelo(aeropuertos, aeropuertos[0],aeropuertos[1],-2))}
-	\STATE Vuelo min = vueloMinimo(aeropuerto$[1]$.vuelosQueLlegan())
+	\STATE Vuelo min = aeropuerto$[1]$.primerVueloQueSaleYLlega
 \STATE $itinerario$.agregar(min,0)
 \WHILE {(min.inicio != inicio) }
-	\STATE Vuelo min $=$ vueloMinimo(min.inicio.vuelosQueLlegan())
+	\STATE Vuelo min $=$ vueloMinimo.primerVueloQueSaleYLlega
 	\STATE $itinerario$.agregar(min,0)
 \ENDWHILE
 \ENDIF
@@ -171,6 +173,62 @@ En la posicion 0 se encuentra el aeropuerto de la ciudad inicial, y en la posici
 \end{algorithmic}
 \end{algorithm}
 
+
+
+\begin{algorithm}[H]
+\begin{algorithmic}[1]
+\IF {(inicio $==$ destino)}	
+		\RETURN TRUE
+\ENDIF
+\IF {(t + 2 $\leq$ inicio.ultimoVueloQueLlega())}	
+		\RETURN TRUE
+\ENDIF
+\STATE boolean llego $=$ false;
+\STATE Conj(vuelo) vuelos $=$ inicio$.$vuelosQueSalen;
+\STATE inicio$.$vuelosQueSalen $=$ $\emptyset$;
+\STATE Conj(vuelo) vuelosNoAnalizados $=$ $\emptyset$;
+\FOR{(Vuelo v $:$ vuelos)}	    
+    \IF {(v.despegue $\geq$ t+2)}	
+        \IF{(v.color $==$ BLANCO)}     				        	
+        		\IF {(existeVuelo(aeropuertos,v.destino,final,v.aterrizaje)}
+				\STATE llego = true
+				\STATE v.color = VERDE
+				\IF {(inicio.ultimoVueloQuellega $<$ v.llegada)}	
+					\STATE inicio.ultimoVueloQuellega = v.llegada
+				\ENDIF
+				\IF {(vuelo.destino.primerVueloQueSaleYLlega.llegada $>$ v.llegada)}	
+					\STATE vuelo.destino.primerVueloQueSaleYLlega = v
+				\ENDIF
+
+			\ELSE
+				\STATE v.color = ROJO								
+	    		\ENDIF    			
+		\ENDIF
+	\ELSE
+		\STATE vuelosNoAnalizados.agregar(v)										    
+    \ENDIF
+\ENDFOR
+\STATE inicio$.$vuelosQueSalen $=$ vuelosNoAnalizados;
+\RETURN $llego$
+\caption{boolean existeVuelo(Aeropuerto[] aeropuertos, Aeropuerto inicio, Aeropuerto final, int t)}% $\rightarrow$ int proximo}
+\end{algorithmic}
+\end{algorithm}
+
+Esta funcion tambien me va a colorear de verde los vuelos que encuentre que lleguen a destino.
+
+El conjunto de vuelos que estan contenidos en un itinerario valido son los que marco de verde.
+
+La funci\'on es recursiva, para poder cumplir la complejidad requerida, creamos un puntero a la lista de vuelos de un aeropuerto, y despues vaciamos esa lista, para que dado que entro en una recursion de un vuelo, no volver a consultar por los mismos vuelos de una ciudad. Esto se basa en el principio de que si dentro de una recursi\'on visito la misma ciudad, el T de la primera recursi\'on va a ser menor al de la segunda, por lo tanto los vuelos que me pueda tomar en la segunda, ya voy a poder evaluarlos en la primera.
+
+Si existe un vuelo que llega a la misma ciudad desde una recursion, se genera un ciclo.
+
+Ese vuelo en particular no nos interesa, ya que cualquier camino de vuelos que pueda existir a partir del instante de llegada de ese vuelo, tambien lo voy a poder hacer con el instante de llegada de la primera recursion ya que es estrictamente menor. 
+
+Por lo tanto dado que se entra en una recursi\'on desde una ciudad inicio, se vacian los vuelos que salen de esa ciudad, para no volver a iterarlos dentro de la recursi\'on y no generar este ciclo.
+
+------------------------------
+
+La siguiente funcion construye un array de aeropuertos, en complejidad O(N.Log(N))
 
 \begin{algorithm}[H]
 \begin{algorithmic}[1]
@@ -211,60 +269,6 @@ Esta funcion va a asignarle un id a cada una de las ciudades y luego construir u
 
 Implementada sobre un trie o sobre un hashmap, para el diccionario de ids me daria una complejidad al algoritmo de crear el mapa de aeropuertos cercana a O(n) en n numero de vuelos. Los nombres de la ciudad tienden a ser Strings de bajo costo de procesamiento en un trie, y en un hashmap la cantidad total de ciudades con aeropuertos en el mundo, es un numero relativamente bajo, por lo tanto se podr\'ia implementar de forma eficiente.
 Nuestra implementaci\'on usa un treeset, asi que la complejidad de crear nuestros aeropuertos es O(n.log(n))
-
-\begin{algorithm}[H]
-\begin{algorithmic}[1]
-\IF {(inicio $==$ destino)}	
-		\RETURN TRUE
-\ENDIF
-\IF {(t + 2 $\leq$ inicio.ultimoVueloQueLlega())}	
-		\RETURN TRUE
-\ENDIF
-\STATE boolean llego $=$ false;
-\STATE Conj(vuelo) vuelos $=$ inicio$.$vuelosQueSalen;
-\STATE inicio$.$vuelosQueSalen $=$ $\emptyset$;
-\STATE Conj(vuelo) vuelosNoAnalizados $=$ $\emptyset$;
-\FOR{(Vuelo v $:$ vuelos)}	    
-    \IF {(v.despegue $\geq$ t+2)}	
-        \IF{(v.color $==$ BLANCO)}     				        	
-        		\IF {(existeVuelo(aeropuertos,v.destino,final,v.aterrizaje)}
-				\STATE llego = true
-				\STATE v.color = VERDE
-				\IF {(inicio.ultimoVueloQuellega $<$ v.llegada)}	
-					\STATE inicio.ultimoVueloQuellega = v.llegada
-				\ENDIF
-			\ELSE
-				\STATE v.color = ROJO								
-	    		\ENDIF    			
-		\ENDIF
-	\ELSE
-		\STATE vuelosNoAnalizados.agregar(v)										    
-    \ENDIF
-\ENDFOR
-\STATE inicio$.$vuelosQueSalen $=$ vuelosNoAnalizados;
-\RETURN $llego$
-\caption{boolean existeVuelo(Aeropuerto[] aeropuertos, Aeropuerto inicio, Aeropuerto final, int t)}% $\rightarrow$ int proximo}
-\end{algorithmic}
-\end{algorithm}
-
-Esta funcion tambien me va a colorear de verde los vuelos que encuentre que lleguen a destino.
-
-El conjunto de vuelos que estan contenidos en un itinerario valido son los que marco de verde.
-
-La funci\'on es recursiva, para poder cumplir la complejidad requerida creamos un puntero a la lista de vuelos de un aeropuerto, y despues vaciamos esa lista, para que dado que entro en una recursion de un vuelo, no volver a consultar por los mismos vuelos de una ciudad. Esto se basa en el principio de que si dentro de una recursi\'on visito la misma ciudad, el T de la primera recursi\'on va a ser menor al de la segunda, por lo tanto los vuelos que me pueda tomar en la segunda, ya voy a haberlos evaluado en la primera.
-
-\begin{algorithm}[H]
-\begin{algorithmic}[1]
-\STATE Vuelo min = null
-\FOR{(Vuelo v: vuelos)}
-	\STATE min $=$ (min$==$null $\vee$ v.aterrizaje $\leq$ min.aterrizaje) $\wedge$ v.color $==$ VERDE
-\ENDFOR
-\RETURN min
-\caption{Vuelo vueloMinimo(Conj(Vuelo) vuelos)}% $\rightarrow$ int proximo}
-\end{algorithmic}
-\end{algorithm}
-
-Esta funcion la implementamos como un puntero al primer vuelo verde que llega a la ciudad, para que la complejidad de buscar el vuelo minimo sea O(1), igualmente implementada de esta manera no afectaria a la complejidad final que seria O($N^{2}$).
 
 //A PARTIR DE ACA NO SE QUE VOY A PONER Y QUE NO
 
@@ -384,6 +388,10 @@ Nuestra implementaci\'on consta de dos partes:
 
 2. Encontrar el conjunto de vuelos validos desde la ciudad origen hasta la destino.
 
+3. Obtener un secuencia valida de Vuelos.
+
+1.
+
 Para construir el array de aeropuertos, lo que se hace es contar la cantidad de ciudades para crear un array de ese tamaño.
 Para ello, se carga cada ciudad en un TreeSet. Como la cantidad de ciudades la podemos acotar por la cantidad de vuelos, ya que a lo sumo tenemos 2 ciudades por vuelo, sea N la cantidad de vuelos, la cantidad de ciudades maximas es de 2.N, por lo tanto el costo de crear este Set es a lo sumo O(n.Log(n))
 
@@ -396,6 +404,8 @@ Luego se asocio cada vuelo a la posicion donde se encuentran la ciudad destino e
 Para ello se busca el id en el mapa. Entonces para asociar todos los vuelos tenemos la complejidad es de O(n.Log(n)).
 
 Luego la complejidad final de construir el array es O(n.Log(n)).
+
+2.
 
 Sea i cualquier instancia de recursion de el algoritmo.
 
@@ -412,8 +422,27 @@ Y para cada llamada recursiva a lo sumo puedo iterar por todos los vuelos de una
 
 Por lo tanto la cantidad total de vuelos que se iteran dado que se llego a una ciudad, en un instante T esta acotado por la cantida total de llamadas recursivas y la cantidad de vuelos que a lo sumo se iteran en cada una. Por lo tanto la cantidad de iteraciones que se realizan tiene una complejidad menor a O($N^{2})$.
 
+3.
 
+Para construir nuestra secuencia de vuelos solucion vamos a iterar por los vuelos minimos que llegan a destino.
+Dada una ciudad Final, un vuelo minimo para una ciudad C, es de todos los vuelos que llegan a C y pertenecen a un itinerario valido, el primero que aterriza en C. 
 
+Todos los vuelos que salen de C y pertenecen a un itinerario valido, pueden ser tomados a partir de aterrizar en C con al menos un vuelo que aterrice en C y pertenezca a un itinerario valido.
 
+El vuelo m\'inimo es el que primero aterriza y pertenece a un itinerario valido, por lo tanto cualquier vuelo que salga de C y pertenezca a un itinerario valido, puedo ser tomado a partir de aterrizar en C con el vuelo minimo.
+
+Suponemos que no existe vuelos que ciclan a la misma ciudad, es decir que su destino y origen es el mismo.
+
+Sea s un secuencia de vuelos, tal que s es un itinerario valido de vuelos minimos.
+
+Para todo i:Nat, i<S.tamanio, $S_{i}$.aterrizaje < $S_{i+1}$.despegue o $S_{i}$.destino == final.
+
+Luego si S contiene un ciclo, el vuelo que cierre ese ciclo, no va a cumplir este invariante, ya que el vuelo minimo es unico para cada ciudad.
+
+Por lo tanto un itinerario v\'alido de vuelos m\'inimos no tiene ciclos 
+
+El itinerario valido mas largo que puede existir sin ciclos es a lo sumo de tamaño N.
+
+Por lo tanto obtener el itinerario cuesta a lo sumo O(N).
 
 \subsection{Tests de complejidad}
