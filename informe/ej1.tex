@@ -223,6 +223,7 @@ Nuestra implementaci\'on usa un treeset, asi que la complejidad de crear nuestro
 \STATE boolean llego $=$ false;
 \STATE Conj(vuelo) vuelos $=$ inicio$.$vuelosQueSalen;
 \STATE inicio$.$vuelosQueSalen $=$ $\emptyset$;
+\STATE Conj(vuelo) vuelosEnAmarillo $=$ $\emptyset$;
 \FOR{(Vuelo v $:$ vuelos)}	    
     \IF {(v.despegue $\geq$ t+2)}	
         \IF{(v.color $==$ BLANCO)}     				        	
@@ -237,9 +238,10 @@ Nuestra implementaci\'on usa un treeset, asi que la complejidad de crear nuestro
 	    		\ENDIF    			
 		\ENDIF
 	\ELSE
-		\STATE incio.vuelosQuellegan.agregar(v)										    
+		\STATE vuelosEnAmarillo.agregar(v)										    
     \ENDIF
 \ENDFOR
+\STATE inicio$.$vuelosQueSalen $=$ vuelosEnAmarillo;
 \RETURN $llego$
 \caption{boolean existeVuelo(Aeropuerto[] aeropuertos, Aeropuerto inicio, Aeropuerto final, int t)}% $\rightarrow$ int proximo}
 \end{algorithmic}
