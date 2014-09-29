@@ -3,8 +3,6 @@ package modelo;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 public class Aeropuerto {
 
@@ -35,9 +33,9 @@ public class Aeropuerto {
 		vuelosQueLlegaronAdestino.add(vuelo);
 	}
 
-	private List<Vuelo> vuelosQueLlegan = new ArrayList<Vuelo>();
+	private List<Vuelo> vuelosQueLlegan = new LinkedList<Vuelo>();
 
-	private List<Vuelo> vuelosQueSalen = new ArrayList<Vuelo>();
+	private List<Vuelo> vuelosQueSalen = new LinkedList<Vuelo>();
 
 	public String ciudad() {
 		return ciudad;
@@ -105,6 +103,10 @@ public class Aeropuerto {
 
 	public void loCalcule() {
 		yaLoCalcule = true;
+	}
+
+	public void asignarVuelosQueLlegan(List<Vuelo> vuelosNoAnalizados) {
+		vuelosQueSalen = vuelosNoAnalizados;
 	}
 
 }

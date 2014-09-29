@@ -14,12 +14,14 @@ public class MainTest {
 		testDeCasoBorde.testUnVuelo();
 		testDeCasoBorde.testSinVuelos();
 		testDeCasoBorde.test2HorasDeDiferenecia();
-
 		// test de casos generados
 		TestGeneradorDeCasos testGeneradorDeCasos = new TestGeneradorDeCasos();
 		testGeneradorDeCasos.testMuchosVuelos();
 		testGeneradorDeCasos.testUnVuelo();
+		// Test de peor caso
+		// TestDePeorCaso testDePeorCaso = new TestDePeorCaso();
+		// testDePeorCaso.todosLosVuelosFallanEnLaSegundaCiudad();
+		// testDePeorCaso.test2Ciudades();
 		System.out.println("test finalzaron correctamente!");
 	}
-
 }
