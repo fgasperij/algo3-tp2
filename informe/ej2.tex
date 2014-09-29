@@ -1,8 +1,8 @@
 \section{Problema 2: Caballos salvajes}
 
 \subsection{Presentación del problema}
-En este problema nos presentan un tablero de dimensiones conocidas pero no acotadas, $n \times n$,
-del mismo tipo que el de ajedrez, es decir un tablero cuadriculado:\\
+En este problema nos presentan un tablero de dimensiones conocidas pero no acotadas
+del mismo tipo que el de ajedrez, es decir un tablero cuadriculado y cuadrado:\\
 \begin{center}
 (TODO insertar imagen de tablero cuadriculado y a los lados llaves que digan 'n')
 \end{center}
@@ -11,18 +11,21 @@ y un conjunto de caballos, piezas de ajedrez, en casillas también conocidas, po
 (TODO insertar imagen del tablero con algunas casillas con una C)
 \end{center}
 el objetivo es reunir a todos los caballos en una misma casilla del tablero con una cantidad
-de movimientos total, es decir sumando los movimientos que le tomo a todos los caballos, mínima.
+de movimientos total, es decir sumando los movimientos que le tomo a cada uno de los caballos, mínima.
 Los movimientos permitidos a los caballos son los mismos que los impuestos por las reglas de ajedrez:\\
 \begin{center}
 (TODO insertar imagen del tablero con una C y x's en los casilleros donde puede saltar el caballo)
 \end{center}
+(TODO el renglón que está debajo de este debería ser el caption de la anterior imagen.)
 La C representa la casilla donde está ubicado el caballo y X los lugares a los cuales podría saltar.
 
 \subsection{Resolución}
-Nosotros modelamos el problema con grafos con lo cual el problema es equivalente al de camino mínimo 
-con un origen y múltiples destinos. En este caso en particular como el salto de un caballo siempre 
-tiene el mismo costo basta recorrer el grafo con Breadth First Search (TODO agregar cita) y el camino mínimo queda 
-determinado como el camino en el árbol generador resultante.
+Nosotros modelamos el problema con grafos con lo cual resultó equivalente al de camino mínimo 
+con un origen y múltiples destinos en un grafo no dirigido sin peso en las aristas. 
+En este caso en particular las aristas no tienen peso porque el salto de un caballo siempre 
+tiene el mismo costo. En un grafo con las características mencionadas el algoritmo de 
+Breadth First Search (TODO agregar cita) obtiene el camino mínimo entre el origen tomado y el resto de los nodos,
+éste es el camino entre el origen y el nodo en árbol generado.
 El modelo consiste en tomar a las casillas del tablero como nodos del grafo, las casillas en las que 
 hay caballos como nodos origen y existe una arista entre dos nodos, casillas, si de una a la otra se
 puede ir con un salto de caballo. Cabe destacar que el salto de caballo es simétrico: si con un salto
@@ -36,7 +39,7 @@ Los pasos para resolver el problema una vez modelado son bastante directos:
 \begin{enumerate}
   \item Recorrer el grafo una vez por cada caballo presente tomando como origen el nodo, casilla, en la 
     que se encuentra el caballo.
-  \item Sumar, en cada nodo, la cantidad de saltos que le toma a cada caballo llegar a él.
+  \item Guardar, en cada nodo, la cantidad de saltos que le toma a cada caballo llegar a él.
   \item Recorrer todos los nodos y quedarse con alguno de los de suma mínima.
 \end{enumerate}
 
@@ -58,7 +61,72 @@ Los pasos para resolver el problema una vez modelado son bastante directos:
 
 
 \subsection{Demostración de correctitud}
+Una instancia del problema está dada por la dimensión del tablero $n$ y la posición
+de los $k$ caballos. Luego de modelarlo tenemos un grafo $G = (V, E)$ tal que $\left\vert{V}\right\vert = n^2$, uno
+por cada nodo, y $\left\vert{E}\right\vert < n^2 * 4$. La cota superior sobre las aristas proviene del hecho de que
+un caballo sólo pude saltar a 8 casillas diferentes como máximo, asumiendo que todos los
+saltos posibles caen dentro del tablero. Por lo tanto, la cantidad de aristas debe ser menor
+a $\frac{n^2 * 8}{2}$ porque en muchas casillas, como las de las esquinas o las de las bandas, la
+mayoría de los saltos posibles caen fuera del tablero. Los caballos los representaremos con un multiconjunto
+de nodos al que llamaremos $origenes$, $\left\vert{origenes}\right\vert = \left\vert{caballos}\right\vert = k$. Utilizamos un multiconjunto 
+para representarlos porque inicialmente puede haber más de un caballo en una casilla determinada.
+Sea $PS_{v,u}$ el conjunto de los caminos posibles entre el nodo $u$ y el nodo $v$.
+Dado un nodo $v$ el conjunto de soluciones posibles asociado a $v$ es $SP_v$:
+\begin{displaymath}
+  SP_v = \left\{ { \sum_{u \in origenes} \left\vert{P_{u,v}}\right\vert : P_{u, v} \in PS_{u, v}} \right\}
+\end{displaymath}
+La solución óptima para un nodo $v$ la denominaremos $SP_v^{opt}$ y está determinada de la siguiente forma:
+\begin{displaymath}
+  SP_v^{opt} = \min \left\{ {s : s \in SP_v} \right\} 
+\end{displaymath}
 
+\begin{lema}
+\label{lema_p2}
+Una solución óptima para un nodo $v$ está compuesta por caminos mínimos entre los orígenes
+y $v$:
+\begin{displaymath}
+  s = SP_v^{opt} \Leftrightarrow s = \sum_{u \in origenes} \min \left\{ { \left\vert{P}\right\vert : P \in PS_{u, v}} \right\}
+\end{displaymath}
+\end{lema}
+\begin{proof}
+  Sea $SP_{opt}$ una solución óptima para el nodo $v$ que contiene un camino $P_{w,v}$ no mínimo. Sea $P_{w,v}^{min}$ 
+un camino mínimo entre $w \in origenes$ y $v$. Sea $SP'_{opt}$:
+\begin{displaymath}
+SP'_{opt} = SP_{opt} \setminus P_{w, v} \cup \left\{{P_{w,v}^{min}}\right\}
+\end{displaymath}
+veamos el costo de $SP'_{opt}$ expresado en función del de $SP_{opt}$:
+\begin{displaymath}
+  SP'_{opt} = \sum_{u \in origenes} \left\vert{P_{u,v}}\right\vert - \left\vert{P_{w,v}}\right\vert + \left\vert{P_{w,v}}\right\vert
+\end{displaymath}
+pero dado que $P_{w,v}$ no es mínimo:
+\begin{displaymath}
+  P_{w,v} > P_{w,v}^{min} \Rightarrow P_{w,v} - P_{w,v}^{min} > 0
+\end{displaymath}
+pero entonces volviendo a la ecuación anterior nos queda que:
+\begin{displaymath}
+  SP'_{opt} < SP_{opt}
+\end{displaymath}
+Lo cual es absurdo porque partimos suponiendo que $SP_{opt}$ era un solución óptima y por lo tanto mínima.
+\end{proof}
+
+Finalmente, caracterizaremos a la solución del problema $S$:
+\begin{displaymath}
+  S = \min_{v \in V} \left\{ {SP_{v}^{opt}} \right\}
+\end{displaymath}
+Nuestro algoritmo calcula el peso del camino mínimo entre cada uno de los orígenes y el resto de los nodos (TODO agregar cita
+al cormen capítulo 22 página 598). 
+Luego suma en cada nodo $v$ el peso de los caminos mínimos desde cada uno de los orígenes hasta él que por \textbf{Lema 1} es
+igual a $SP_{v}^{opt}$. Por último, recorre todos los nodos y toma el mínimo entre todos los $SP_{v}^{opt}$ calculados
+lo cual es precisamente la solución que acabamos de definir.
+
+\subsection{Análisis de complejidad}
+No es necesario construir el grafo explícitamente ya que los saltos de caballo desde una casilla pueden contruirse 
+ad hoc, por lo tanto, dada un nodo, casilla, obtener los vecinos del mismo tiene costo $O(1)$ porque a lo sumo
+puede contar con 8 vecinos:
+(TODO insertar imagen de un tablero con una C en el centro, otra en un rincón y otra en una banda, indicando en cada
+caso los saltos posibles)
+
+\subsection{Tests de complejidad}
 
 
 \subsection{Análisis de complejidad}
