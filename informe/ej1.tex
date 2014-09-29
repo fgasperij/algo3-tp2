@@ -411,7 +411,7 @@ Sea i una llamada recursiva del algoritmo.
 
 Sea $Inicio_{i}$:Ciudad, la ciudad inicial de la recursion i.
 
-Sea $ST_{i}$:Nat, el instante T de la recursion i.
+Sea $T_{i}$:Nat, el instante T de la recursion i.
 
 Como antes de empezar a iterar por los vuelos que salen de $Inicio_{i}$, se borra el puntero a este conjunto en $Inicio_{i}$, puede asegurar que los vuelos que salen de $Inicio_{i}$, no van a estar incluidos en cualquier recursion a partir de i.
 
@@ -421,38 +421,40 @@ Entonces para cualquier recursion a partir de i, se chequean a lo sumo todos los
 
 Cuando se genera una llamada recursiva se colorea el vuelo, por lo tanto ese vuelo nunca mas va a ser llamado recursivamente ya que se conoce el estado para cualquer instante de tiempo.
 
-Por lo tanto el algoritmo puedo tener tantas llamadas recursivas como vuelos distintos tenga.
+Entonces el algoritmo puedo tener tantas llamadas recursivas como vuelos distintos tenga.
 El numero de vuelos distintos es N.
 
-Y para cada llamada recursiva a lo sumo puendo iterar por exactamente una vez por cada vuelo.
+Y para cada llamada recursiva a lo sumo se itera exactamente una vez por cada vuelo.
 
 Por lo tanto la cantidad total de vuelos que se iteran dado que se llego a una ciudad, en un instante T esta acotado por la cantida total de llamadas recursivas y la cantidad de vuelos que a lo sumo se iteran en cada una.
 
 Existen a lo sumo N recursiones, y una recursion tiene un complejidad a lo sumo de O(N) para conocer su estado.
 
-Luego la cantidad de iteraciones m\'axima que se realizan tiene una complejidad a lo usmo O($N^{2})$.
+Luego la cantidad de iteraciones m\'axima que se realizan tiene una complejidad a lo sumo O($N^{2})$.
 
 3.
 
 Para construir nuestra secuencia de vuelos solucion vamos a iterar por los vuelos minimos que llegan a destino.
 Dada una ciudad Final, un vuelo minimo para una ciudad C, es de todos los vuelos que llegan a C y pertenecen a un itinerario valido, el primero que aterriza en C. 
 
-Todos los vuelos que salen de C y pertenecen a un itinerario valido, pueden ser tomados a partir de aterrizar en C con al menos un vuelo que aterrice en C y pertenezca a un itinerario valido.
+Todos los vuelos que salen de C y pertenecen a un itinerario valido, pueden ser tomados por un pasajero, a partir de aterrizar en C, con al menos un vuelo que aterrice en C y pertenezca a un itinerario valido.
 
 El vuelo m\'inimo es el que primero aterriza y pertenece a un itinerario valido, por lo tanto cualquier vuelo que salga de C y pertenezca a un itinerario valido, puedo ser tomado a partir de aterrizar en C con el vuelo minimo.
 
-Suponemos que no existe vuelos que ciclan a la misma ciudad, es decir que su destino y origen es el mismo.
+Suponemos que no existe vuelos que ciclan a la misma ciudad, es decir que su destino y origen es el mismo. (informalmente podemos descartar estos vuelos porque si existe una solucion para ellos, existe una solucion para otro vuelo pero que no genere un ciclo).
 
 Sea s un secuencia de vuelos, tal que s es un itinerario valido de vuelos minimos.
 
-Para todo i:Nat, i<S.tamanio, $S_{i}$.aterrizaje < $S_{i+1}$.despegue o $S_{i}$.destino == final.
+Para todo i,j:Nat, i,j$<$S.tamanio $\wedge$ i<j, $S_{i}$.aterrizaje $<$ $S_{j}$.despegue o $S_{i}$.destino $==$ final.
 
-Luego si S contiene un ciclo, el vuelo que cierre ese ciclo, no va a cumplir este invariante, ya que el vuelo minimo es unico para cada ciudad.
+Luego si S contiene un ciclo, va a existir al menos un vuelo, que pertenezca a ese ciclo,(en particular va a ser el vuelo que cierre ese ciclo), no va a cumplir este invariante, ya que el vuelo minimo es unico para cada ciudad.
 
-Por lo tanto un itinerario v\'alido de vuelos m\'inimos no tiene ciclos 
+Por lo tanto un itinerario v\'alido de vuelos m\'inimos no tiene ciclos. 
 
 El itinerario valido mas largo que puede existir sin ciclos es a lo sumo de tamaño N.
 
 Por lo tanto obtener el itinerario cuesta a lo sumo O(N).
 
+
+Luego la complejidad total del algoritmo es O(N.Log(N)) + O($N^{2})$ + O(N) $=$ O($N^{2})$
 \subsection{Tests de complejidad}
