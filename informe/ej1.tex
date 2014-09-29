@@ -407,20 +407,30 @@ Luego la complejidad final de construir el array es O(n.Log(n)).
 
 2.
 
-Sea i cualquier instancia de recursion de el algoritmo.
+Sea i una llamada recursiva del algoritmo.
 
-Se puede asegurar que los vuelos de la ciudad inicio en i, no van a estar incluidos en cualquier recursion a partir de i. Es decir, no existen ciclos en la recursion, donde un ciclo seria volver a recursar sobre un vuelo que sea de una iteracion anterior.
+Sea $Inicio_{i}$:Ciudad, la ciudad inicial de la recursion i.
 
-Por lo tanto para cualquier recursion a partir de i, se chequean a lo sumo todos los vuelos exactamente una vez.
+Sea $ST_{i}$:Nat, el instante T de la recursion i.
 
-Cuando se genera una llamada recursiva se colorea el vuelo, por lo tanto ese vuelo nunca mas va a ser llamada recursivamente ya que se conoce el estado para cualquer instante de tiempo.
+Como antes de empezar a iterar por los vuelos que salen de $Inicio_{i}$, se borra el puntero a este conjunto en $Inicio_{i}$, puede asegurar que los vuelos que salen de $Inicio_{i}$, no van a estar incluidos en cualquier recursion a partir de i.
+
+Es decir, no existen ciclos en la recursion, donde un ciclo seria volver a recursar sobre un vuelo que sea de una iteracion anterior.
+
+Entonces para cualquier recursion a partir de i, se chequean a lo sumo todos los vuelos exactamente una vez.
+
+Cuando se genera una llamada recursiva se colorea el vuelo, por lo tanto ese vuelo nunca mas va a ser llamado recursivamente ya que se conoce el estado para cualquer instante de tiempo.
 
 Por lo tanto el algoritmo puedo tener tantas llamadas recursivas como vuelos distintos tenga.
 El numero de vuelos distintos es N.
 
-Y para cada llamada recursiva a lo sumo puedo iterar por todos los vuelos de una ciudad, los cuales estan acotados por N.
+Y para cada llamada recursiva a lo sumo puendo iterar por exactamente una vez por cada vuelo.
 
-Por lo tanto la cantidad total de vuelos que se iteran dado que se llego a una ciudad, en un instante T esta acotado por la cantida total de llamadas recursivas y la cantidad de vuelos que a lo sumo se iteran en cada una. Por lo tanto la cantidad de iteraciones que se realizan tiene una complejidad menor a O($N^{2})$.
+Por lo tanto la cantidad total de vuelos que se iteran dado que se llego a una ciudad, en un instante T esta acotado por la cantida total de llamadas recursivas y la cantidad de vuelos que a lo sumo se iteran en cada una.
+
+Existen a lo sumo N recursiones, y una recursion tiene un complejidad a lo sumo de O(N) para conocer su estado.
+
+Luego la cantidad de iteraciones m\'axima que se realizan tiene una complejidad a lo usmo O($N^{2})$.
 
 3.
 
