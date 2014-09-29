@@ -80,7 +80,9 @@ $\wedge$ ExisteVuelo(vuelos,v.destino, destino, v.aterrizaje)))
 
 Esta expresi\'on nos indica si dado un instante T, en alguna ciudad c existe una secuencia de vuelos valida que nos lleva desde c hasta la ciudad destino que queremos llegar.
 
-Solo nos va a interesar un vuelo v tal que exista un itinerario valido hasta tomarnos v y que exista un itinerario valido hasta nuestra ciudad destino a partir de tomarnos v.
+Solo nos va a interesar un vuelo v tal que exista un itinerario valido hasta tomarnos v y que exista un itinerario valido hasta nuestra ciudad destino a partir de tomarnos v, esta noci\'on va a definir nuestro conjunto de vuelos v\'alidos.
+
+Como se puede notar el enunciado de ExisteVuelo, esta definido recursivamente.
 
 Dados C:Conj(Vuelo), $inicio$:Ciudad, $destino$:Ciudad.
 
@@ -100,47 +102,10 @@ Asi que, cualquier itinerario valido que contenga a $destino$ en su ultimo vuelo
 
 Para ello solo deberiamos elegir vuelos que me lleven a mi ciudad inicial, utilizando como ultimo vuelo a VueloMinimo. En particular vamos a obtener siempre el primer vuelo que llegue a la ciudad desde donde sale mi actual VueloMinimo y pertenezcan al conjunto de vuelos posibles.
 
-Para obtener el conjunto de vuelos v\'alidos vamos a implementar una funci\'on recursiva que itere por los vuelos que salen desde la ciudad inicial hasta la ciudad final, los siguientes enunciados son importantes para entender en que se basa el algoritmo.
-
-Dados, $vuelos$:conj(Vuelo), una ciudad $C$, $inicio$:Ciudad y $destino$:Ciudad
-
-Corolario 1:
-
-\begin{align*}
-(ExisteVuelo(vuelos,inicio, C, 0) \wedge (\exists v:Vuelo, v \in Validos(vuelos,inicio,C))\\
-(v.destino == C \wedge ExisteVuelo(vuelos,C, destino, v.aterrizaje))) \implies \\ ExisteVuelo(vuelos,inicio, destino, 0)
-\end{align*}
-Corolario 2:
-
-\begin{align*}
-(\forall C':Ciudad / \exists v:Vuelo, v.inicio == C' \wedge v.destino == C)\\
-(ExisteVuelo(vuelos,C,destino,v.aterrizaje) \implies \\
-ExisteVuelo(vuelos,C',destino,v.despegue) \wedge v \in Validos(vuelos,C',destino)
-\end{align*}
-\begin{align*}
-\end{align*}
-
-
-Corolario 3:
-
-Sea v:Vuelo tal que:
-\begin{align*}
-v.destino == C \wedge v \in Validos(vuelos,C,destino) \wedge\\
-(\forall v':Vuelo, v' \in Validos(vuelos,C,destino)(v.aterrizaje \geq v'.aterrizaje))\\
-\end{align*}
-Entonces:
-\begin{align*}
-(\forall C':Ciudad / \exists w:Vuelo, w.inicio == C' \wedge w.destino == C)\\
-w.aterizaje + 2 \leq v.despegue \implies w \in Validos(vuelos,C',destino) 
-\end{align*}
-
-
-
-
-
+\newpage
 \subsection{PseudoC\'odigo a la c++}
 
-\newpage
+
 Nuestro algoritmo final quedaria de la siguiente manera:
 
 Definimos Color como un enum $[$BLANCO,ROJO,VERDE$]$
@@ -173,7 +138,8 @@ En la posicion 0 se encuentra el aeropuerto de la ciudad inicial, y en la posici
 \end{algorithmic}
 \end{algorithm}
 
-
+\newpage
+La siguiente funci\'on obtiene el conjunto de vuelos v\'alidos desde una ciudad inicio hasta una ciudad destino, en el instante T, si el conjunto existe devuelve TRUE, sino FALSE.
 
 \begin{algorithm}[H]
 \begin{algorithmic}[1]
@@ -214,19 +180,27 @@ En la posicion 0 se encuentra el aeropuerto de la ciudad inicial, y en la posici
 \end{algorithmic}
 \end{algorithm}
 
-Esta funcion tambien me va a colorear de verde los vuelos que encuentre que lleguen a destino.
+Esta funci\'on se llama recursivamente con los vuelos de la ciudad inicio. El caso base de la funci\'on es cuando llega a la ciudad destino o cuando llega a un camino de vuelos v\'alidos, entonces devuelve true.
 
-El conjunto de vuelos que estan contenidos en un itinerario valido son los que marco de verde.
+Si itera por todos los vuelos de ciudad inicio, y ningun vuelo llega a destino ni sus llamadas recursivas respectivas, entonces devuelve false.
 
-La funci\'on es recursiva, para poder cumplir la complejidad requerida, creamos un puntero a la lista de vuelos de un aeropuerto, y despues vaciamos esa lista, para que dado que entro en una recursion de un vuelo, no volver a consultar por los mismos vuelos de una ciudad. Esto se basa en el principio de que si dentro de una recursi\'on visito la misma ciudad, el T de la primera recursi\'on va a ser menor al de la segunda, por lo tanto los vuelos que me pueda tomar en la segunda, ya voy a poder evaluarlos en la primera.
+Cada vez que detecte que un vuelo $v$ llega al destino o a un camino de vuelos que me lleven a destino, colorea de verde a $v$ y actualiza dos datos:
 
-Si existe un vuelo que llega a la misma ciudad desde una recursion, se genera un ciclo.
+Un puntero en v.destino, al primer vuelo que aterriza en $v$.destino y llega al destino.
 
-Ese vuelo en particular no nos interesa, ya que cualquier camino de vuelos que pueda existir a partir del instante de llegada de ese vuelo, tambien lo voy a poder hacer con el instante de llegada de la primera recursion ya que es estrictamente menor. 
+Un Nat que representa el instante de aterrizaje del \'ultimo vuelo que aterriza en Inicio, y llega a destino.
+
+Luego el conjunto de vuelos que estan contenidos en alg\'un itinerario v\'alido son los que marco de verde.
+
+La funci\'on es recursiva, para poder cumplir la complejidad requerida, creamos un puntero a la lista de vuelos de un aeropuerto, y en caso de tener que hacer una llamada recursiva, se apunta a null esa lista, para que dado que entro en una recursion de un vuelo, no volver a consultar por los mismos vuelos de una ciudad. Esto se basa en el principio de que si dentro de una recursi\'on visito la misma ciudad, el T de la primera recursi\'on va a ser menor al de la segunda, por lo tanto los vuelos que me pueda tomar en la segunda, ya voy a poder evaluarlos en la primera.
+
+Si existe un vuelo que llega a la misma ciudad desde una recursi\'on, se genera un ciclo.
+
+Ese vuelo en particular no nos interesa, ya que cualquier camino de vuelos que pueda existir a partir del instante de llegada de ese vuelo a la ciudad C, tambien lo voy a poder hacer con el instante de llegada de la primera recursion a C, ya que es estrictamente menor por lo tanto todos los vuelos que est\'en disponibles en la segunda iteraci\'on tambi\'en van estarlo en la primera. 
 
 Por lo tanto dado que se entra en una recursi\'on desde una ciudad inicio, se vacian los vuelos que salen de esa ciudad, para no volver a iterarlos dentro de la recursi\'on y no generar este ciclo.
 
-------------------------------
+\newpage
 
 La siguiente funcion construye un array de aeropuertos, en complejidad O(N.Log(N))
 
@@ -254,12 +228,12 @@ La siguiente funcion construye un array de aeropuertos, en complejidad O(N.Log(N
 \ENDFOR
 \STATE i $=$ 1
 \FOR {(Vuelo vuelo: Vuelos)}	
-	\STATE vuelo.id = i	
+	\STATE vuelo.id = i++	
 	\STATE vuelo.color = BLANCO	
 	\STATE int id = ids.obtener(vuelo.origen)
-	\STATE ciudades.obtener(id).vuelosQueSalen().agregar(vuelo)
-	\STATE int id = ids.obtener(vuelo.destino)
-	\STATE ciudades.obtener(id).vuelosQueLlegan().agregar(vuelo)
+	\STATE aeropuertos[id].vuelosQueSalen().agregar(vuelo)
+	\STATE id = ids.obtener(vuelo.destino)
+	\STATE aeropuertos[id].vuelosQueLlegan().agregar(vuelo)
 \ENDFOR
 \RETURN ciudades
 \caption{Aeropuerto[] construirArrayDeAeropuertos(Conj(Vuelo) vuelos, Ciudad inicio, Ciudad final)}% $\rightarrow$ int proximo}
@@ -378,7 +352,44 @@ Como mi vuelo pertenecia a un camino verde, existe al menos un vuelo que sale de
 
 Luego la sucesi\'on de vuelos obtenida de esta manera desde la ciudad final, comenzando con T = $\infty$ es una soluci\'on a nuestro problema ya que va desde a hasta b, y el \'ultimo vuelo de esa sucesi\'on es el de menor horario de aterrizaje en b, de los vuelos que llegan desde a hasta b por un camino verde.
 
+\newpage
+
 \subsection{Demostración}
+Para obtener el conjunto de vuelos v\'alidos vamos a implementar una funci\'on recursiva que itere por los vuelos que salen desde la ciudad inicial hasta la ciudad final, los siguientes enunciados son importantes para entender en que se basa el algoritmo.
+
+Dados, $vuelos$:conj(Vuelo), una ciudad $C$, $inicio$:Ciudad y $destino$:Ciudad
+
+Corolario 1:
+
+\begin{align*}
+(ExisteVuelo(vuelos,inicio, C, 0) \wedge (\exists v:Vuelo, v \in Validos(vuelos,inicio,C))\\
+(v.destino == C \wedge ExisteVuelo(vuelos,C, destino, v.aterrizaje))) \implies \\ ExisteVuelo(vuelos,inicio, destino, 0)
+\end{align*}
+Corolario 2:
+
+\begin{align*}
+(\forall C':Ciudad / \exists v:Vuelo, v.inicio == C' \wedge v.destino == C)\\
+(ExisteVuelo(vuelos,C,destino,v.aterrizaje) \implies \\
+ExisteVuelo(vuelos,C',destino,v.despegue) \wedge v \in Validos(vuelos,C',destino)
+\end{align*}
+\begin{align*}
+\end{align*}
+
+
+Corolario 3:
+
+Sea v:Vuelo tal que:
+\begin{align*}
+v.destino == C \wedge v \in Validos(vuelos,C,destino) \wedge\\
+(\forall v':Vuelo, v' \in Validos(vuelos,C,destino)(v.aterrizaje \geq v'.aterrizaje))\\
+\end{align*}
+Entonces:
+\begin{align*}
+(\forall C':Ciudad / \exists w:Vuelo, w.inicio == C' \wedge w.destino == C)\\
+w.aterizaje + 2 \leq v.despegue \implies w \in Validos(vuelos,C',destino) 
+\end{align*}
+
+
 \newpage
 
 \subsection{Análisis de complejidad}
@@ -386,7 +397,7 @@ Nuestra implementaci\'on consta de dos partes:
 
 1. Construir el array de aeropuertos.
 
-2. Encontrar el conjunto de vuelos validos desde la ciudad origen hasta la destino.
+2. Encontrar el conjunto de vuelos validos desde la ciudad origen hasta la ciudad destino.
 
 3. Obtener un secuencia valida de Vuelos.
 
@@ -411,13 +422,18 @@ Sea i una llamada recursiva del algoritmo.
 
 Sea $Inicio_{i}$:Ciudad, la ciudad inicial de la recursion i.
 
-Sea $T_{i}$:Nat, el instante T de la recursion i.
+%Sea $T_{i}$:Nat, el instante T de la recursion i.
 
-Como antes de empezar a iterar por los vuelos que salen de $Inicio_{i}$, se borra el puntero a este conjunto en $Inicio_{i}$, puede asegurar que los vuelos que salen de $Inicio_{i}$, no van a estar incluidos en cualquier recursion a partir de i.
 
-Es decir, no existen ciclos en la recursion, donde un ciclo seria volver a recursar sobre un vuelo que sea de una iteracion anterior.
+Antes de empezar a iterar por los vuelos que salen de $Inicio_{i}$, se borra el puntero a este conjunto en $Inicio_{i}$.
 
-Entonces para cualquier recursion a partir de i, se chequean a lo sumo todos los vuelos exactamente una vez.
+Si vuelvo a $Inicio_{i}$ en una instancia de recursion a partir de i,puedo asegurar que los vuelos que salen de $Inicio_{i}$, no van a estar incluidos.
+
+Es decir, no existen ciclos en la recursion, donde un ciclo seria volver a iterar por un vuelo que se haya iterado anterioremente.
+
+Entonces para cualquier recursion, se chequean a lo sumo todos los vuelos de cada ciudad.
+
+Todos los vuelos de cada ciudad son exactamente N vuelos.
 
 Cuando se genera una llamada recursiva se colorea el vuelo, por lo tanto ese vuelo nunca mas va a ser llamado recursivamente ya que se conoce el estado para cualquer instante de tiempo.
 
@@ -428,7 +444,7 @@ Y para cada llamada recursiva a lo sumo se itera exactamente una vez por cada vu
 
 Por lo tanto la cantidad total de vuelos que se iteran dado que se llego a una ciudad, en un instante T esta acotado por la cantida total de llamadas recursivas y la cantidad de vuelos que a lo sumo se iteran en cada una.
 
-Existen a lo sumo N recursiones, y una recursion tiene un complejidad a lo sumo de O(N) para conocer su estado.
+Existen a lo sumo N recursiones ya que existen a lo sumo N vuelos que puedo llamar recursivamente, y una recursion tiene un complejidad a lo sumo de O(N) para conocer su estado.
 
 Luego la cantidad de iteraciones m\'axima que se realizan tiene una complejidad a lo sumo O($N^{2})$.
 
