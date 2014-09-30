@@ -18,7 +18,12 @@ public class TestDeConstructorDeAeropuertos {
 	private int maxHora = 1000;
 	private Main main = new Main();
 
-	
+	public static void main(String[] args) {
+		TestDeConstructorDeAeropuertos testDeConstructorDeAeropuertos = new TestDeConstructorDeAeropuertos();
+		testDeConstructorDeAeropuertos.testSinVuelos();
+		testDeConstructorDeAeropuertos.testSinMasCiudades();
+		System.out.println("test finalzaron correctamente!");
+	}
 
 	public void testSinVuelos() {
 		String[] s = new String[0];
@@ -33,8 +38,7 @@ public class TestDeConstructorDeAeropuertos {
 		String[] s = new String[vuelos];
 		int llegada = random.nextInt(maxHora) + 1;
 		for (int i = 0; i < s.length; i++) {
-			s[i] = origen + " " + destino + " " + random.nextInt(llegada) + " "
-					+ llegada;
+			s[i] = origen + " " + destino + " " + random.nextInt(llegada) + " " + llegada;
 		}
 		Aeropuerto[] aeropuertos = main.crearInstancia(s, origen, destino);
 		assert (aeropuertos.length == 2);
