@@ -227,8 +227,19 @@ Para testear la complejidad de peor caso, construimos 100 instancias aleatorias 
 \begin{figure}[H]
 	\begin{minipage}[t]{\linewidth}
 		\centering
-		\includegraphics[width=\textwidth]{p3_complejidad.jpg}
+		\includegraphics[width=\textwidth]{p3_complejidad_grafos_completos.jpg}
 		%\caption{}
-		\label{fig:p3_complejidad}
+		\label{fig:p3_complejidad_grafos_completos}
+	\end{minipage}
+\end{figure}
+
+Testeamos también para grafos aleatorios, esto es, para cada $n$ cantidad de vértices, hicimos aleatoria la cantidad de aristas (de $0$ a $\frac{n(n-1)}{2}$) y las seleccionamos también aleatoriamente. Aumentamos a 1000 las instancias, dejando igual el resto de la configuración. La complejidad en este caso esperamos que sea también $O(n^2 \log n)$, ya que elegimos la cantidad de aristas de manera uniforme, por lo que el valor esperado de aristas para $n$ vértices es $\frac{n(n-1)}{4} = O(n^2)$ y entonces valen las mismas conclusiones sacadas en la sección de análisis de complejidad. Como antes, dividimos la muestra por $n \log n$:
+
+\begin{figure}[H]
+	\begin{minipage}[t]{\linewidth}
+		\centering
+		\includegraphics[width=\textwidth]{p3_complejidad_grafos_aleatorios.jpg}
+		%\caption{}
+		\label{fig:p3_complejidad_grafos_aleatorios}
 	\end{minipage}
 \end{figure}
