@@ -244,113 +244,7 @@ Esta funcion va a asignarle un id a cada una de las ciudades y luego construir u
 Implementada sobre un trie o sobre un hashmap, para el diccionario de ids me daria una complejidad al algoritmo de crear el mapa de aeropuertos cercana a O(n) en n numero de vuelos. Los nombres de la ciudad tienden a ser Strings de bajo costo de procesamiento en un trie, y en un hashmap la cantidad total de ciudades con aeropuertos en el mundo, es un numero relativamente bajo, por lo tanto se podr\'ia implementar de forma eficiente.
 Nuestra implementaci\'on usa un treeset, asi que la complejidad de crear nuestros aeropuertos es O(n.log(n))
 
-//A PARTIR DE ACA NO SE QUE VOY A PONER Y QUE NO
 
-
-Primero notamos que para encontrar el mejor itinerario de movimientos de un turista, yendo de ciudad a ciudad en aviones, iba a ser necesario recorrer los vuelos que sean posibles desde la ciudad donde estabamos parados y ver a que otros vuelos nos llevaban. 
-
-Notamos que dado un instante T, el flujo de vuelos que pod\'iamos tomarnos desde una ciudad dependia siempre de la ciudad inicial, y del momento en el que nos encontremos en esa ciudad, y nos iba a interesar solo los que finalizaran en la ciudad final con menor instante de aterrizaje.
-
-Luego para que nuestra soluc\'on tuviera el menor instante T de aterrizaje en $destino$, vamos a definir al m\'inimo vuelo posible en nuestra ciudad final tal que:
-
-m\'inimoFinal $\equiv$ v $\Leftrightarrow$ 
-
-
-Por lo tanto se podria visualizar el flujo de aviones de ciudad en ciudad como una grafo direccional donde los vertices son las ciudades, y existen aristas por cada uno de los vuelos. 
-
-Sin ninguna restricci\'on a partir de esto, no podr\'iamos introducir el concepto de horario de vuelo.
-Estas aristas no ibamos a poder recorrerlas de cualquier forma, ya que un vuelo solo puedo tomarmelo en determinados horarios de arribo a una ciudad. 
-
-Por lo tanto ibamos a necesitar recorrerlas asociadas a un T:Nat que seria el tiempo desde que salimos desde el origen hasta llegar a la ciudad actual.
-
-Viendo esta estructura podriamos recorrer con un BFS modificado, los caminos que lleven de a hasta b, agregandole una variable temporal a ese BFS, para el descubrimiento de aristas realizarlo solo si el vuelo asociado despegaba despu\'es del instante T de llegada.
-
-A ese T, que seria el tiempo de entrada a una ciudad habria que agregarle 2hs, que son las que se necesitan para los tr\'amites un usuario del itinerario. Tambi\'en notamos que podriamos simplemente cargar el despegue de los vuelos como 2 hs antes ya que llegar a una ciudad y esperar 2 hs para el despegue, es lo mismo que decir que el despegue es 2 horas antes.
-
-Con esta estructura y con un BFS modificado para considerar un tiempo T, podr\'iamos hallar todos los caminos que vayan desde a hasta b. 
-
-El problema que notamos es que esta funci\'on a priori, era bastante ineficiente. ya que si llegabamos a una ciudad dos veces con el mismo instante t, debiamos calcular dos veces si un camino de vuelos nos llebaba a una soluci\'on o no.
-
-Para optimizar este mecanimos, optamos por marcar cuando sean posibles y cuando no llega a la ciudad final dado que nos tomamos un cierto vuelo. Para marcarlo utilzamos, un flag de coloreo para aristas.
-
-Con este coloreo no solo logramos que nuestro algoritmo recorra exactamente una vez cada arista, sino que no reorra aristas que nunca se puede tomar.
-
-Tomamos la idea de coloreo del recorrido de un BFS, del libro Introduction to algorithm, donde lo usa para marcar nodos totalmente descubiertos, nodos parcialmente descubiertos y nodos sin descubrir.
-
-En nuestra implementaci\'on vamos a colorear aristas, ya que lo que queremos marcar son los vuelos que nos lleven desde a hasta b.
-
-Luego simplemente podemos ir al nodo que le corresponde a la ciudad b, tomarnos el vuelo que tenga aterrizaje m\'inimo, es decir el que primero llegue a la ciudad final b y recorrer cualquier camino marcado como posible hasta a.
-
-Notamos entonces que para todo vuelo v, yo puedo definir una subsoluci\'on optima dado un instante T tal que me diga el mejor camino de vuelos a partir de tomarme v.
-Por lo tanto, nuestra solucion seria el mejor camino de vuelos que yo puedo tomarme a partir de tomarme cualquier vuelo que salga de la ciudad inicial con T = 0, con esa idea creamos la siguiente funcion recursiva.
-
-\begin{algorithm}[H]
-\begin{algorithmic}[1]
-\FOR {(Vuelo v: m.obtener(inicio).vuelosDeSalida) }
-	\IF {(v.destino $==$ destino)}	
-		\STATE return TRUE
-	\ENDIF
-    \IF {(v.despegue $\geq$ t)}	
-        \RETURN existeVuelo(m,v.destino,final,v.aterrizaje)
-    \ENDIF
-\ENDFOR
-\RETURN $FALSE$
-\caption{boolean existeVuelo(Mapa$<$Ciudad,Vuelo$>$) m, Ciudad inicio, Ciudad final, int t)}% $\rightarrow$ int proximo}
-\end{algorithmic}
-\end{algorithm}
-
-Donde m es el mapa de $<$Ciudad,Conj(Vuelo)$>$ tal que dada un conjunto c de vuelos, las claves de m son las Ciudades(c) y en el valor de cada clave, obtengo los vuelos que salen y llegan de esa ciudad. Luego veremos que costruir este mapa nos va a agregar un costo a la complejidad final del algoritmo.  
-
-Lo que consigo con este algoritmo es un boolean que me indica si llego a la ciudad final desde una ciudad inicial con un tiempo asociado. Entonces lo que nos interesaria saber a nosotros es si existeVuelo(m,a,b,0) $\equiv$ TRUE. 
-
-Como vemos podemos relacionar este algoritmo con la t\'ecnica recursiva de BFS.
-
-Como vemos esta funci\'on recursiva tiene un costo alto de complejidad ya que si por ejemplo llegamos desde dos caminos distintos a la misma ciudad y luego tomamos el mismo vuelo para salir de ella, no sabriamos a priori que ese camino ya se calculo en la primera iteraci\'on. He aqu\'i que agregamos el concepto de Colores a los caminos.
-
-Vamos a marcar a todos los vuelos en color Blanco al principio del algoritmo, para poder identificar los vuelos que todavia no nos pudimos tomar.
-
-Vamos a marcar de color verde los vuelos a los que por algun camino llegamos a la ciudad destino, por un camino de vuelos o en su defecto llegamos a un camino verde.
-
-Y finalmente vamos a marcar de color rojo a todo vuelo v que dado que nos lo tomamos no llegamos a ning\'un camino verde ni al destino.
-
-Para ello vamos a modificar levemente el algoritmo anterior de recorrido de nuestro sistema. Recordemos, los vuelos inician en color BLANCO.
-
-\begin{algorithm}[H]
-\begin{algorithmic}[1]
-\IF {(v.destino $==$ destino)}	
-		\RETURN TRUE
-\ENDIF
-\STATE boolean llego = false;
-\FOR {(Vuelo v: m.obtener(inicio).vuelosDeSalida) }	    
-    \IF {(v.despegue $\geq$ t)}	
-		\IF{(v.color $==$ VERDE)}
-			\STATE llego = TRUE
-        \ENDIF
-        \IF{(v.color $==$ BLANCO)}     				        	
-        		\IF {(existeVuelo(m,v.destino,final,v.aterrizaje)}
-				\STATE llego = true;
-				\STATE v.color = VERDE;
-			\ELSE
-				\STATE v.color = ROJO;								
-	    		\ENDIF    			
-		\ENDIF		    
-    \ENDIF
-\ENDFOR
-\RETURN $llego$
-\caption{boolean existeVuelo(Mapa$<$Ciudad,Vuelo$>$) m, Ciudad inicio, Ciudad final, int t)}% $\rightarrow$ int proximo}
-\end{algorithmic}
-\end{algorithm}
-
-Con este algoritmo cuando terminemos de recorrer el sistema de vuelos, vamos a tener que agarrar el camino Verde, que nos lleve al primer vuelo que aterrice en la ciudad final y este marcado del mismo color.
-
-Para eso lo que haremos ser\'a obtener recursivamente las ciudades desde nuestra ciudad final, tomandome exactamente el primer vuelo que aterrice y sea de color verde.
-
-Ahora nuestra variable T, va a ser el horario de despegue de cada vuelo que haya tomado. 
-
-Es decir, si el primer vuelo que llega a mi ciudad final (o sea el de menor horario de aterrizaje) y tenga color verde tiene un horario de despegue a las 14hs y sale de la ciudad $c$, entonces voy a buscar los vuelos que esten marcados de verde y lleguen a c en horario menor o igual a 14hs. Recordemos aca entra en juego, lo de alargar el horario de aterrizaje 2 horas para cada vuelo.
-Como mi vuelo pertenecia a un camino verde, existe al menos un vuelo que sale de $c$ y aterriza antes de las 14hs.
-
-Luego la sucesi\'on de vuelos obtenida de esta manera desde la ciudad final, comenzando con T = $\infty$ es una soluci\'on a nuestro problema ya que va desde a hasta b, y el \'ultimo vuelo de esa sucesi\'on es el de menor horario de aterrizaje en b, de los vuelos que llegan desde a hasta b por un camino verde.
 
 \newpage
 
@@ -474,3 +368,52 @@ Por lo tanto obtener el itinerario cuesta a lo sumo O(N).
 
 Luego la complejidad total del algoritmo es O(N.Log(N)) + O($N^{2})$ + O(N) $=$ O($N^{2})$
 \subsection{Tests de complejidad}
+
+Para analizar y testear tannto complejidad como correctitud del algoritmo implementado para la resoluci\'on del problema  realizamos los siguientes testeos:
+
+\begin{itemize}
+  \item Test de casos borde.
+  \item Test de generaci\'on de casos pseudo aleatorios.
+  \item Test de analisis de peor caso.
+\end{itemize}
+
+\newpage
+
+\subsubsection{Test de casos borde}
+
+
+Los siguientes test fueron implementados:
+
+\begin{itemize}
+  \item testUnVuelo() $=$ Chequea dado un conjunto de vuelos, tal que todos los vuelos salen de inicio, que la soluci\'on sea el de menor aterrizaje.
+  \item 	testSinVuelos() $=$ Dado un conjunto vacio de vuelos, asegura la soluci\'on es "no".
+  \item test2HorasDeDiferenecia() Asegura que la soluci\'on contenga 2hs de diferencia entre vuelo y vuelo.
+  \item testCiclosALaMismaCiudad() $=$ Asegura dado que existe un ciclo a la misma ciudad, el algoritmo devuelva una soluci\'on v\'alida.
+  \item testLlegoPorUnCaminoAntesQueDerecho() $=$ Asegura que la soluci\'on sea un el camino que m\'as temprano llegue y no es m\'s corto.
+  \item testCiclos $=$ Asegura dado que existen ciclos en mi conjunto de vuelos (es decir vuelvo a la misma ciudad desde un vuelo) el algoritmo retorne una soluci\'on v\'alida.
+\end{itemize}
+
+\subsubsection{Test de generaci\'on de casos pseudo aleatorios}
+
+TODO
+\newpage
+\subsubsection{Test de analisis de peor caso}
+
+Una instancia donde encontramos que la complejidad iba a tender a nuestra cota de O($N^{2}$), es cuando una la ciudad inicial tiene N/2 vuelos, que aterrizan en C:Ciudad, y luego C tiene N/2 vuelos que van desde C hasta cualquier otra ciudad con un horario de despegue mayor a cualquier vuelo desde la ciudad inicial.
+
+Como el algoritmo no puede saber en cada recursi\'on si va a existir un vuelo v\'alido para el T de entrada, tiene que iterar por todos los vuelos de C. Como desde inicio salen N/2 vuelos, la complejidad la funci\'on existeVuelo es $N^{2}$/4
+
+Para el gr\'afico siguiente se generaron entradas diferentes de N y para cada entrada se corri\'o el algoritmo un numero K de veces.
+
+Para cada entrada de tamaño S, se tomo el tiempo de corrida de esa entrada, y de todas las instancias de igual tamaño se considero el menor tiempo en el que el algoritmo devolv\'ia una soluci\'on.
+
+Como se corri\'o dentro de una m\'aquina deterministica, este es el mejor tiempo que se pudo obtener para cada instancia. 
+
+Luego obtuvimos se obtuvo el siguiente gr\'afico:
+
+\begin{figure}[ht]
+	\begin{minipage}[t]{\linewidth}
+		\centering
+		\includegraphics[width=\textwidth]{GraficoDeVuelosYTiempo.jpg}
+	\end{minipage}	
+\end{figure}
