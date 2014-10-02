@@ -12,7 +12,7 @@
 
 int main() {
  // configuration
- const bool test_n = true;
+ const bool test_n = false;
 
  std::string in_file;
  std::string out_file;
@@ -33,29 +33,42 @@ int main() {
 
  ifs >> instances;
 
- for (int i = 0; i < instances; i++) {
-   std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
-
+ for (int i = 4; i < instances; i++) {
+   std::cout << "PROCESSING INSTANCE " << i << endl;
    int n, k;
    ifs >> n >> k;
-   Board board(n, k);
-   int r, c;
-   for (int i = 0; i < k; i++) {
-     ifs >> r >> c;
-     bfs(i, Square(r, c), board);
+   std::cout << "n: " << n << " k: " << k << endl;
+
+   vector<vector<int> > horses (k, vector<int>(2, -1));
+   for (int h = 0; h < k; h++) {
+     ifs >> horses[h][0] >> horses[h][1];
    }
 
-   vector<int> result = board.get_min_sum();
+   long long int minimum = std::chrono::microseconds::max().count();
+   for (int j = 0; j < 2; j++) {
+     std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
-   std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
-   //std::chrono::duration<std::chrono::microseconds> time_span = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1);
+     Board board(n, k);
+     
+     for (int l = 0; l < k; l++) {
+       bfs(l, Square(horses[l][0], horses[l][1]), board);
+     }
+     
+
+     vector<int> result = board.get_min_sum();
+
+     std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+
+     long long int current = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+     if (current < minimum) {
+       minimum = current;
+     }
+   }
 
    if (test_n) {
-     //ofs << n << ' ' << time_span.count() << endl;
-     ofs << n << ' ' << std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() << endl;
+     ofs << n << ' ' << minimum/n << endl;
    } else {
-     ofs << k << ' ' << std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() << endl;
-     //ofs << k << ' ' << time_span.count() << endl;
+     ofs << k << ' ' << minimum << endl;
    }
  }
 

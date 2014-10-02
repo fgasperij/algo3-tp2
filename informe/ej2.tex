@@ -42,6 +42,21 @@ Los pasos para resolver el problema una vez modelado son bastante directos:
   \item Guardar, en cada nodo, la cantidad de saltos que le toma a cada caballo llegar a él.
   \item Recorrer todos los nodos y quedarse con alguno de los de suma mínima.
 \end{enumerate}
+Hay un conjunto pequeño de instancias para los cuales la solución del problema es trivial:
+\begin{description}
+  \item[$n = 1$] los caballos sólo pueden estar en una casilla por lo cual la solución es la única casilla
+    que existe y la cantidad de movimientos totales es 0.
+  \item[$n = 2$] los caballos no pueden realizar movimiento permitido alguno. Sólo existe solución en el caso
+    en el que los caballos se encuentran todos en la misma casilla.
+  \item[$n = 3$] existe solución siempre excepto cuando un caballo comienza en la casilla central del tablero
+    en cuyo caso no tiene movimientos permitidos y del resto de las casillas no existe forma de llegar a la
+    casilla central mediante movimientos permitidos, lo cual es trivial si vemos que desde la casilla central
+    no existen movimientos permitidos porque como ya mencionamos los movimientos del caballo son simétricos.
+  \item[$n > 4$] se puede probar fácilmente que de cualquier casilla del tablero se puede acceder a cualquier otra,
+    por lo tanto cuando la dimensión del tablero es mayor a 4 siempre existe solución.
+\end{description}
+En el pseudocódigo no mostramos el manejo de instancias que poseen un tablero de dimensión menor a 4 porque
+al ser muy particulares no aportan mayor claridad a la presentación de la idea central del algoritmo.
 
 \subsection{Pseudocódigo}
 \begin{algorithm}[H]
@@ -59,6 +74,27 @@ Los pasos para resolver el problema una vez modelado son bastante directos:
   \end{algorithmic}
 \end{algorithm}
 
+\begin{algorithm}[H]
+  \begin{algorithmic}
+    %\STATE $\gets$ \WHILE{} \ENDWHILE \IF{} \ELSE \ENDIF
+    \STATE $nodos_{no visitados}$ $\gets$ Cola
+    \STATE push($nodos_{no visitados}$, $origen$)
+    \STATE $tablero_{origen}$ $\gets$ 0
+    \STATE $vecinos$ $\gets$ Cola
+    \WHILE {$nodos_{no visitados} \neq \emptyset$}
+      \STATE $nodo_{actual}$ $\gets$ pop($nodos_{no visitados}$)
+      \STATE $vecinos$ $\gets$ obtener\_vecinos($nodo_{actual}$)
+      \WHILE {$vecinos \neq \emptyset$}
+        \STATE $vecino$ $\gets$ pop($vecinos$)
+        \IF {$neg$ esta\_marcado($tablero$, $vecino$)}
+          \STATE $tablero_{vecino}$ $\gets$ $tablero_{nodo_{actual}}$+1
+          \STATE $distancias_{vecino}$ $\gets$ $distancias_{vecino}$ + $tablero_{vecino}$
+          \STATE push($nodos_{no visitados}$, $vecino$)
+        \ENDIF
+      \ENDWHILE
+    \ENDWHILE
+  \end{algorithmic}
+\end{algorithm}
 
 \subsection{Demostración de correctitud}
 Una instancia del problema está dada por la dimensión del tablero $n$ y la posición
@@ -137,7 +173,7 @@ caso los saltos posibles)
 \end{center}
 Tampoco es necesario guardar la distancia desde cada origen hasta cada uno de los nodos ya que sólo nos interesará
 la suma total sobre cada nodo. Por lo tanto, basta con ir sumando la distancia de cada uno de los orígenes hasta él.\\
-El costo de aplicar BFS es $O(\left\vert{E}\right\vert) = O(n^2 * 8) = O(n^2)$ (TODO agregar cita al cormen) porque, 
+El costo de aplicar BFS es $O(\left\vert{E}\right\vert + \left\vert{V}\right\vert) = O(n^2 * 8 + n^2) = O(n^2)$ (TODO agregar cita al cormen) porque, 
 como ya vimos, la cantidad de aristas del grafo está acotada por la cantidad de nodos, porque el caballo a lo sumo
 puede saltar a 8 casillas diferentes.\\
 Por último, buscar el mínimo tiene un costo $O(\left\vert{V}\right\vert) = O(n^2)$ porque simplemente consiste
@@ -149,5 +185,50 @@ Por lo tanto, la complejidad está dada por:
 \begin{displaymath}
   O(n^2) + k * O(n^2) + O(n^2) = O(k * n^2)
 \end{displaymath}
+La cota obtenida $O(n^2 * k)$ es además válida para $\Theta (n^2 * k)$ porque lo único que puede variar de una
+instancia a otra del mismo tamaño es la posición de los caballos en el tablero. Sin embargo, la cantidad de nodos
+y aristas del grafo es independiente de la posición de los caballos en el tablero. Por lo tanto, el costo de
+construir el grafo, recorrerlo con BFS y luego recorrer todos los nodos para obtener el de suma mínima
+es el mismo para todas las instancias del mismo tamaño.
 
 \subsection{Tests de complejidad}
+El objetivo de las experimentaciones que realizaremos es corroborar que las cotas obtenidas por nuestro análisis
+de complejidad son reflejadas por los resultados empíricos. Como la cota depende de la cantidad de caballos
+utilizados y las dimensiones del tablero realizaremos dos experimentos:
+\begin{enumerate}
+  \item Mantendremos la cantidad de caballos ($k$) constante e incrementaremos la dimensión del tablero ($n$) para
+    ver si realmente la relación con el crecimiento de la dimensión del tablero es efectivamente cuadrática.
+  \item Mantendremos el la dimensión del tablero ($n$) constante e incrementaremos la cantidad de caballos para
+    constatar si la relación con la cantidad de caballos es lineal como calculamos.
+\end{enumerate}
+
+En el primer experimento variamos la dimensión del tablero desde 1 hasta 100 con un salto de 1. La posición de los
+caballos fue elegida pseudo-aleatoriamente, sin restringir que dos caballos tengan la misma posición original.
+Para cada dimensión $n$ generamos 10 posicionamientos distintos de los caballos, cada posicionamiento lo ejecutamos
+10 veces y nos quedamos con la corrida de menor tiempo de cada posicionamiento para finalmente tomar el promedio
+sobre los mínimos de los 10 posicionamientos distintos. Ésto lo realizamos para $k = 5, 10, 15$. El gráfico
+que muestra los resultados es el siguiente:
+\begin{figure}[H]
+	\begin{minipage}[t]{\linewidth}
+		\centering
+		\includegraphics[width=\textwidth]{p2_varia_dimension.png}
+		%\caption{}
+		\label{fig:p2_complejidad_varia_dimension_tablero}
+	\end{minipage}
+\end{figure}
+Como se ve en el gráfico la cantidad de microsegundos la dividimos por la dimensión del tablero ($n$) y las
+curvas resultantes para los 3 casos de caballos se acercan mucho a una recta.
+
+El segundo experimento consistió en tomar un tablero de dimensión fija, en este caso en particular elegimos $n = 40, 70, 100$, y 
+variar la cantidad de caballos desde 2 a 50. La posición de los caballos en este caso también fue elegida pseudo-aleatoriamente
+y para cada instancia de k caballos la corrimos con 10 posicionamientos distintos de los cuales tomamos el promedio y cada posicionamiento
+lo corrimos también 10 veces y nos quedamos con el mínimo. Presentamos los resultados en el siguiente gráfico:
+\begin{figure}[H]
+	\begin{minipage}[t]{\linewidth}
+		\centering
+		\includegraphics[width=\textwidth]{p2_varia_k.png}
+		%\caption{}
+		\label{fig:p2_complejidad_varia_k}
+	\end{minipage}
+\end{figure}
+
