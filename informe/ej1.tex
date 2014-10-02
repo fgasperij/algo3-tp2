@@ -2,13 +2,13 @@
 
 \subsection{Presentación del problema}
 
-Se quiere crear un sitio web para reservas de pasajes de avi\'on. El sitio debe tener un sistema de b\'usqueda de itinerarios de vuelo. Un itinerario de vuelo, es una sucesi\'on de vuelos los cuales logran llevar a un pasajero hacia un destino. Dado una ciudad de salida, y una ciudad de llegada, se busca crear un itinirario de vuelos que vaya desde la ciudad de salida hasta la de llegada.
+Se quiere crear un sitio web para reservas de pasajes de avi\'on. El sitio debe tener un sistema de b\'usqueda de itinerarios de vuelo. Un itinerario de vuelo, es una sucesi\'on de vuelos los cuales logran llevarte hacia un destino. Dado una ciudad de salida, y una ciudad de llegada, se busca crear un itinirario de vuelos que me lleve desde la ciudad de salida hasta la de llegada.
 
 Dentro de este itinerario, cada vuelo tiene un horario de despegue y uno de aterrizaje. 
 
-Para poder ser un itinerario v\'alido, la ciudad de destino de un vuelo dentro del itinerario, tiene que ser la ciudad de llegada del pr\'oximo o directamente el destino final donde queriamos llegar, y en particular cada vez que llego a una ciudad debo esperar al menos dos horas desde el aterrizaje, para poder tomarme cualquier vuelo que salga desde esa ciudad, lo cual resulta l\'ogico dado que una persona puede necesitar al menos ese tiempo para tr\'amites de aeropuerto.
+Para poder ser un itinerario valido, la ciudad de destino de un vuelo, tiene que ser la ciudad de llegada del pr\'oximo o directamente el destino donde queriamos llegar, y en particular cada vez que llego a una ciudad debo esperar al menos dos horas desde el aterrizaje, para poder tomarme un vuelo, lo cual resulta l\'ogico dado que una persona puede necesitar al menos ese tiempo para tr\'amites de aeropuerto.
 
-Es por eso que se nos pide el mejor itinerario, teniendo al menos dos horas entre cada vuelo, donde mejor itinerario es el que primero aterriza en la ciudad destino final.
+Es por eso que se nos pide el mejor itinerario, teniendo al menos dos horas entre cada vuelo, donde mejor itinerario es el que primero llega a la ciudad destino.
 
 Adem\'as se nos pide que la resoluci\'on de este problema se implemente en un complejidad no peor a O($N^{2}$) donde N es la cantidad de vuelos totales que existen en todo el sistema (formen parte del itinerario o no).
 
@@ -23,87 +23,84 @@ Sea Vuelo una tupla $<$despegue:Nat, aterrizaje:Nat, origen:Ciudad, destino:Ciud
 Dado $vuelos$:Conj(Vuelo):
 
 Llamemos a $ciudadades$:Conj(Ciudad) al conjunto tal que:
-\begin{align*}
-(\forall c:Ciudad, c \in ciudades)  \Leftrightarrow (\exists v:Vuelo)/ v \in vuelos \wedge (v.origen \equiv c \vee v.destino \equiv c))
-\end{align*}
+
+($\forall$ $c$:Ciudad, $c$ $\in$ $ciudades$)  $\Leftrightarrow$ ($\exists$ $v,v'$:Vuelo$/$ $v$,$v'$) $\subset$ $vuelos$ $\wedge$ ($v$.origen $\equiv$ $c$ $\vee$ $v'$.destino $\equiv$ $c$))
+
 Dadas $a,b$:Ciudad, $a,b \in ciudades$. 
 
 Sean los enunciados:
 
-
-\begin{align*}
-esItinerarioValido(S:Sec<Vuelo> , a:Ciudad, b:Ciudad) \equiv \\
-(S_{0}.origen \equiv a \wedge S_{S.tamanio-1}.destino \equiv b) \wedge \\ 
-(\forall i:Nat, 0 \leq i <S.tamanio-1)(S_{i}.destino \equiv S_{i+1}.origen 
-\wedge S_{i}.aterrizaje + 2 \leq S_{i+1}.despegue))
-\end{align*}
-
-Este enunciado indica si una secuencia de vuelos en particular, no vacia, es un itinerario v\'alido para nuestro problema.
-
-\begin{align*}
-Sec<Vuelo> s \subseteq Conj(Vuelo) c \equiv 
-(\forall i:Nat, 0 \leq i \geq s )(s_{i} \in  c)
-\end{align*}
+esItinerarioValido(Sec$<$Vuelo$>$ $S$, Ciudad a, Ciudad b) $\equiv$
  
-Este enunciado es un abuso de notaci\'on para indicar que una secuencia de vuelos esta contenidad en un conjunto de vuelos.
+($S_{0}$.origen $\equiv a \wedge S_{S.tamanio-1}$.destino$ \equiv b) \wedge$ 
 
+($\forall$ $i$:Nat, 0 $\leq$ i $<S.tamanio-1$)($S_{i}$.destino $\equiv$ $S_{i+1}$.origen 
+
+$\wedge$ $S_{i}$.aterrizaje + 2 $\leq$ $S_{i+1}$.despegue))
+
+---------------------
+
+Sec$<$Vuelo$>$ s $\subseteq$ Conj(Vuelo) c $\equiv$ 
+
+($\forall i:$Nat, 0 $\leq i \geq$ s )($s_{i}$ $\in $ c) 
+ 
+---------------------------------------------------------------------------------------------
 
 Se nos pide encontrar $S$:Sec$<$Vuelo$>$ tal que 
-\begin{align*}
-esItinerarioValido(S,a,b) \wedge (S \subseteq vuelos) \wedge \\
-(\forall S':Sec<Vuelo> / (esItinerarioValido(S',a,b)) \wedge (S' \subseteq vuelos) \implies \\  
-S_{S.tamanio-1}.aterrizaje) \leq S'_{S'.tamanio-1}.aterrizaje))
-\end{align*}
+
+esItinerarioValido($S$,a,b) $\wedge$ ($S \subseteq$ vuelos) $\wedge$ 
+
+$(\forall$ $S'$:Sec$<$Vuelo$>$ $/$ (esItinerarioValido($S'$,a,b)) $\wedge$ ($S' \subseteq$ vuelos) $\implies$  
+
+$S_{S.tamanio-1}$.aterrizaje$) \leq S'_{S'.tamanio-1}$.aterrizaje))
+
+Se nos pide encontrar $S$:Sec$<$Vuelo$>$ tal que 
+
+esItinerarioValido($S$,a,b) $\wedge$ ($S \subseteq$ vuelos) $\wedge$ 
+
+$(\forall$ $S'$:Sec$<$Vuelo$>$ $/$ (esItinerarioValido($S'$,a,b)) $\wedge$ ($S' \subseteq$ vuelos) $\implies$  
+
+$S_{S.tamanio-1}$.aterrizaje$) \leq S'_{S'.tamanio-1}$.aterrizaje))
+
 
 \newpage
 \subsection{Resolución}
 
-Habiendo caracterizado la soluci\'on a nuestro problema en lenguaje formal, vamos a tratar de encontrar una implementaci\'on para un algoritmo que devuelva una instancia de esa soluci\'on.
+Habiendo caracterizado la soluci\'on a nuestro problema en leguaje formal, vamos a tratar de encontrar una implementaci\'on para un algoritmo que devuelva una instancia de esa soluci\'on.
 
 Dados C:Conj(Vuelo), $inicio$:Ciudad, $destino$:Ciudad y el instante T:Nat, que va a ser un instante de tiempo.
 
 Sea la funci\'on:
-\begin{align*}
-boolean\;ExisteVuelo(Conj(Vuelo) \; vuelos,\; Ciudad\;inicio,\;Ciudad\;destino,\;Nat \;T) \equiv\\
-(inicio == destino) \vee (\exists v:Vuelo, v \in vuelos) / (v.inicio == inicio \; \wedge \\ 
-v.despegue - 2 \geq T) \\
-\wedge ExisteVuelo(vuelos,v.destino, destino, v.aterrizaje)))  
-\end{align*}
 
-Esta expresi\'on nos indica si dado un instante T, en alguna ciudad c existe una secuencia de vuelos v\'alida que nos lleva desde c hasta la ciudad destino que queremos llegar.
+boolean ExisteVuelo(Conj(Vuelo) vuelos, Ciudad inicio,Ciudad destino,Nat T) $\equiv$
 
-Solo nos va a interesar un vuelo v tal que exista un itinerario v\'alido hasta tomarnos v y que exista un itinerario v\'alido hasta nuestra ciudad destino a partir de tomarnos v, esta noci\'on va a definir nuestro conjunto de vuelos v\'alidos.
+(inicio $==$ destino) $\vee$ ($\exists$ v:Vuelo, v $\in$ vuelos) $/$ (v.inicio $==$ inicio $\wedge$ v.despegue - 2 $\geq$ T 
+
+$\wedge$ ExisteVuelo(vuelos,v.destino, destino, v.aterrizaje))) 
+
+Esta expresi\'on nos indica si dado un instante T, en alguna ciudad c existe una secuencia de vuelos valida que nos lleva desde c hasta la ciudad destino que queremos llegar.
+
+Solo nos va a interesar un vuelo v tal que exista un itinerario valido hasta tomarnos v y que exista un itinerario valido hasta nuestra ciudad destino a partir de tomarnos v, esta noci\'on va a definir nuestro conjunto de vuelos v\'alidos.
 
 Como se puede notar el enunciado de ExisteVuelo, esta definido recursivamente.
 
 Dados C:Conj(Vuelo), $inicio$:Ciudad, $destino$:Ciudad.
 
 Podemos definir el conjunto Validos(C,inicio,destino):Conj(Vuelo), como:
-\begin{align*}
-(\forall v:Vuelo, v \in Validos(C,inicio,destino)) \Leftrightarrow ((v.origen == inicio \;\vee \\
-(\exists v':Vuelo, v' \in Validos(C,inicio,destino) / v'.destino == v.origen \wedge v'.aterrizaje + 2 \leq\\ v.despegue)) \wedge ExisteVuelo(C,v.destino,destino,v.aterrizaje) \wedge v \in C)
-\end{align*}
 
-Dado este conjunto podemos definir el VueloMinimo:Vuelo, tal que VueloMinimo pertenezca al conjunto de vuelos v\'alidos y VueloMinimo sea el primero que aterrice en cada ciudad..
+($\forall$ v:Vuelo, v $\in$ Validos(C,inicio,destino)) $\Leftrightarrow$ ((v.origen $==$ $inicio$ $\vee$ ($\exists$ v':Vuelo, v' $\in$ Validos(C,inicio,destino) $/$ v'.destino $==$ v.origen $\wedge$ v'.aterrizaje + 2 $\leq$ v.despegue)) $\wedge$ ExisteVuelo(C,v.destino,$destino$,v.aterrizaje) $\wedge$ v $\in$ C)
 
-Dados C:Conj(Vuelo), $inicio$:Ciudad, $destino$:Ciudad, $ciudad$:Ciudad.
-\begin{align*}
-VueloMinimo(C,inicio,destino,ciudad) \equiv v:Vuelo \Leftrightarrow (v \in Validos(C,inicio,destino) \wedge\\ v.destino == ciudad \wedge (\forall v':Vuelo, v' \in Validos(C,inicio,destino) \wedge \\
-v'.destino == ciudad) \implies v.aterrizaje \leq v'.aterrizaje)
-\end{align*}
+Dado este conjunto podemos definir el VueloMinimo:Vuelo, tal que VueloMinimo pertenezca al conjunto de vuelos validos y VueloMinimo sea el primero que aterrice en nuestra ciudad final.
 
-Nuestro algoritmo va a obtener este VueloMinimo $v$ para cada ciudad, tal que $v$ pertenezca al conjunto de vuelos v\'alidos desde inicio hasta destino . Las caracteristica de VueloMinimo es que es el primero de los vuelos que llegan a una ciudad por un itinerario v\'alido desde inicio hasta destino.
+Dados C:Conj(Vuelo), $inicio$:Ciudad, $destino$:Ciudad.
 
-En particular se puede observar que, cualquier itinerario v\'alido que contenga al vuelo m\'inimo de la ciudad destino, es decir a VueloMinimo(C,inicio,destino,destino) en su \'ultimo vuelo va a ser soluci\'on de nuestro problema. 
+VueloMinimo(C,$inicio$,$destino$) $\equiv$ v:Vuelo $\Leftrightarrow$ (v $\in$ Validos(C,inicio,destino) $\wedge$ v.destino $==$ $destino$ $\wedge$ ($\forall$ v':Vuelo, v' $\in$ Validos(C,inicio,destino) $\wedge$ v'.destino $==$ $destino$) $\implies$ v.aterrizaje $\leq$ v'.aterrizaje)
 
-Esto es ya que no va existir un itinerario v\'alido que aterrice antes en destino, que cualquier itinerario v\'alido que contenga a ese vuelo.
+Nuestro algoritmo va a obtener este VueloMinimo. Las caracteristica de VueloMinimo es que es el primero de los vuelos que llegan a nuestro $destino$ por un itinerario valido.
 
-Luego la soluci\'on s:Sec$<$Vuelo$>$ que se devuelve como itinerario de vuelos por nuestro algoritmo, cumple:
+Asi que, cualquier itinerario valido que contenga a $destino$ en su ultimo vuelo va a ser soluci\'on de nuestro problema.
 
-\begin{align*}
-esItinerarioValido(s,inicio,destino) \wedge s \subseteq C \wedge \\
-(\forall v:Vuelo, v \in s)(s == VueloMinimo(C,inicio,destino,s.destino))
-\end{align*}
+Para ello solo deberiamos elegir vuelos que me lleven a mi ciudad inicial, utilizando como ultimo vuelo a VueloMinimo. En particular vamos a obtener siempre el primer vuelo que llegue a la ciudad desde donde sale mi actual VueloMinimo y pertenezcan al conjunto de vuelos posibles.
 
 \newpage
 \subsection{PseudoC\'odigo a la c++}
@@ -183,9 +180,9 @@ La siguiente funci\'on obtiene el conjunto de vuelos v\'alidos desde una ciudad 
 \end{algorithmic}
 \end{algorithm}
 
-Esta funci\'on se llama recursivamente con los vuelos de la ciudad inicio. El caso base de la funci\'on es cuando llega a la ciudad destino o cuando llega a un camino de vuelos v\'alidos que se pueda tomar desde el instante T, entonces devuelve true.
+Esta funci\'on se llama recursivamente con los vuelos de la ciudad inicio. El caso base de la funci\'on es cuando llega a la ciudad destino o cuando llega a un camino de vuelos v\'alidos, entonces devuelve true.
 
-Si itera por todos los vuelos de ciudad inicio, y si ning\'un vuelo llega a destino ni sus llamadas recursivas respectivas, entonces devuelve false.
+Si itera por todos los vuelos de ciudad inicio, y ningun vuelo llega a destino ni sus llamadas recursivas respectivas, entonces devuelve false.
 
 Cada vez que detecte que un vuelo $v$ llega al destino o a un camino de vuelos que me lleven a destino, colorea de verde a $v$ y actualiza dos datos:
 
@@ -290,28 +287,28 @@ w.aterizaje + 2 \leq v.despegue \implies w \in Validos(vuelos,C',destino)
 \newpage
 
 \subsection{Análisis de complejidad}
-Nuestra implementaci\'on consta de tres partes:
+Nuestra implementaci\'on consta de dos partes:
 
 1. Construir el array de aeropuertos.
 
-2. Encontrar el conjunto de vuelos v\'alidos desde la ciudad origen hasta la ciudad destino.
+2. Encontrar el conjunto de vuelos validos desde la ciudad origen hasta la ciudad destino.
 
-3. Obtener un secuencia valida de Vuelos m\'inimos.
+3. Obtener un secuencia valida de Vuelos.
 
 1.
 
 Para construir el array de aeropuertos, lo que se hace es contar la cantidad de ciudades para crear un array de ese tamaño.
-Para ello, se carga cada ciudad en un TreeSet. Como la cantidad de ciudades la podemos acotar por la cantidad de vuelos, ya que a lo sumo tenemos 2 ciudades por vuelo, sea N la cantidad de vuelos, la cantidad de ciudades maximas es de 2.N, por lo tanto el costo de crear este Set es a lo sumo O(N.Log(N))
+Para ello, se carga cada ciudad en un TreeSet. Como la cantidad de ciudades la podemos acotar por la cantidad de vuelos, ya que a lo sumo tenemos 2 ciudades por vuelo, sea N la cantidad de vuelos, la cantidad de ciudades maximas es de 2.N, por lo tanto el costo de crear este Set es a lo sumo O(n.Log(n))
 
 Crear el array tiene una complejidad temporal de O(N) a lo sumo y espacial de 2.N.
 
 Luego se le asocia un id a estas ciudades, que va a ser la posicion donde se van a encontrar en el array. Para poder asociarle este id se construye un mapa $\langle Ciudad,ID \rangle$.
-Buscar en este mapa nos va a costar O(Log(N)) y construirlo O(N.Log(N)).
+Buscar en este mapa nos va a costar O(Log(N)).
 
 Luego se asocio cada vuelo a la posicion donde se encuentran la ciudad destino e inicio de ese vuelo.
-Para ello se busca el id en el mapa. Entonces para asociar todos los vuelos tenemos la complejidad es de O(N.Log(N)).
+Para ello se busca el id en el mapa. Entonces para asociar todos los vuelos tenemos la complejidad es de O(n.Log(n)).
 
-Luego la complejidad final de construir el array es O(N.Log(N)).
+Luego la complejidad final de construir el array es O(n.Log(n)).
 
 2.
 
@@ -326,16 +323,15 @@ Antes de empezar a iterar por los vuelos que salen de $Inicio_{i}$, se borra el 
 
 Si vuelvo a $Inicio_{i}$ en una instancia de recursion a partir de i,puedo asegurar que los vuelos que salen de $Inicio_{i}$, no van a estar incluidos.
 
-Es decir, no existen ciclos en la recursi\'on, donde un ciclo seria volver a iterar por un vuelo que se haya iterado anterioremente.
+Es decir, no existen ciclos en la recursion, donde un ciclo seria volver a iterar por un vuelo que se haya iterado anterioremente.
 
-Entonces para cualquier recursi\'on, se chequean a lo sumo todos los vuelos de cada ciudad.
+Entonces para cualquier recursion, se chequean a lo sumo todos los vuelos de cada ciudad.
 
 Todos los vuelos de cada ciudad son exactamente N vuelos.
 
 Cuando se genera una llamada recursiva se colorea el vuelo, por lo tanto ese vuelo nunca mas va a ser llamado recursivamente ya que se conoce el estado para cualquer instante de tiempo.
 
 Entonces el algoritmo puedo tener tantas llamadas recursivas como vuelos distintos tenga.
-
 El numero de vuelos distintos es N.
 
 Y para cada llamada recursiva a lo sumo se itera exactamente una vez por cada vuelo.
@@ -348,27 +344,24 @@ Luego la cantidad de iteraciones m\'axima que se realizan tiene una complejidad 
 
 3.
 
-Para construir nuestra secuencia de vuelos soluci\'on vamos a iterar por los vuelos m\'inimos de cada ciudad que llegan a destino.
-Un vuelo minimo para una ciudad C, es de todos los vuelos que llegan a C y pertenecen a un itinerario v\'alido desde inicio hasta la ciudad final, el primero que aterriza en C. 
+Para construir nuestra secuencia de vuelos solucion vamos a iterar por los vuelos minimos que llegan a destino.
+Dada una ciudad Final, un vuelo minimo para una ciudad C, es de todos los vuelos que llegan a C y pertenecen a un itinerario valido, el primero que aterriza en C. 
 
-%Todos los vuelos que salen de C y pertenecen a un itinerario v\'alido, pueden ser tomados por un pasajero, a partir de aterrizar en C, con al menos un vuelo que aterrice en C y pertenezca a un itinerario valido.
+Todos los vuelos que salen de C y pertenecen a un itinerario valido, pueden ser tomados por un pasajero, a partir de aterrizar en C, con al menos un vuelo que aterrice en C y pertenezca a un itinerario valido.
 
-%El vuelo m\'inimo es el que primero aterriza y pertenece a un itinerario valido, por lo tanto cualquier vuelo que salga de C y pertenezca a un itinerario valido, puedo ser tomado a partir de aterrizar en C con el vuelo minimo.
+El vuelo m\'inimo es el que primero aterriza y pertenece a un itinerario valido, por lo tanto cualquier vuelo que salga de C y pertenezca a un itinerario valido, puedo ser tomado a partir de aterrizar en C con el vuelo minimo.
 
 Suponemos que no existe vuelos que ciclan a la misma ciudad, es decir que su destino y origen es el mismo. (informalmente podemos descartar estos vuelos porque si existe una solucion para ellos, existe una solucion para otro vuelo pero que no genere un ciclo).
 
-Sea s un secuencia de vuelos, tal que s es un itinerario v\'alido de vuelos minimos.
+Sea s un secuencia de vuelos, tal que s es un itinerario valido de vuelos minimos.
 
-\begin{align*}
-(\forall i,j:Nat, i,j<S.tamanio \wedge i<j)(S_{i}.aterrizaje < S_{j}.despegue
-\vee S_{i}.destino == final)
-\end{align*}
+Para todo i,j:Nat, i,j$<$S.tamanio $\wedge$ i<j, $S_{i}$.aterrizaje $<$ $S_{j}$.despegue o $S_{i}$.destino $==$ final.
 
-Luego si S contiene un ciclo, va a existir al menos un vuelo, que pertenezca a ese ciclo,(en particular va a ser el vuelo que cierre ese ciclo), no va a cumplir este invariante, ya que el aterrizaje de un vuelo es siempre mayor a su despegue (en particular por como lo definimos podr\'ia existir m\'as de un vuelo m\'inimo por ciudad, pero igual fallar\'ia ya que el horario de aterrizaje deber\'ia ser igual para todo vuelo m\'inimo de una ciudad).
+Luego si S contiene un ciclo, va a existir al menos un vuelo, que pertenezca a ese ciclo,(en particular va a ser el vuelo que cierre ese ciclo), no va a cumplir este invariante, ya que el vuelo minimo es unico para cada ciudad.
 
 Por lo tanto un itinerario v\'alido de vuelos m\'inimos no tiene ciclos. 
 
-El itinerario v\'alido mas largo que puede existir sin ciclos es a lo sumo de tamaño N.
+El itinerario valido mas largo que puede existir sin ciclos es a lo sumo de tamaño N.
 
 Por lo tanto obtener el itinerario cuesta a lo sumo O(N).
 
@@ -376,7 +369,7 @@ Por lo tanto obtener el itinerario cuesta a lo sumo O(N).
 Luego la complejidad total del algoritmo es O(N.Log(N)) + O($N^{2})$ + O(N) $=$ O($N^{2})$
 \subsection{Tests de complejidad}
 
-Para analizar y testear tanto complejidad como correctitud del algoritmo implementado para la resoluci\'on del problema  realizamos los siguientes testeos:
+Para analizar y testear tannto complejidad como correctitud del algoritmo implementado para la resoluci\'on del problema  realizamos los siguientes testeos:
 
 \begin{itemize}
   \item Test de casos borde.
@@ -396,7 +389,7 @@ Los siguientes test fueron implementados:
   \item 	testSinVuelos() $=$ Dado un conjunto vacio de vuelos, asegura la soluci\'on es "no".
   \item test2HorasDeDiferenecia() Asegura que la soluci\'on contenga 2hs de diferencia entre vuelo y vuelo.
   \item testCiclosALaMismaCiudad() $=$ Asegura dado que existe un ciclo a la misma ciudad, el algoritmo devuelva una soluci\'on v\'alida.
-  \item testLlegoPorUnCaminoAntesQueDerecho() $=$ Asegura que la soluci\'on sea el camino que m\'as temprano llegue y no el m\'s corto.
+  \item testLlegoPorUnCaminoAntesQueDerecho() $=$ Asegura que la soluci\'on sea un el camino que m\'as temprano llegue y no es m\'s corto.
   \item testCiclos $=$ Asegura dado que existen ciclos en mi conjunto de vuelos (es decir vuelvo a la misma ciudad desde un vuelo) el algoritmo retorne una soluci\'on v\'alida.
 \end{itemize}
 
@@ -404,29 +397,23 @@ Los siguientes test fueron implementados:
 
 Se genero instancias pseudo-aleatorias de entrada para el algoritmo.
 
-La pseudo-aleatoridad se basaba en generar N vuelos aleatorios, es decir vuelos donde el punto de partida y el de aterrizaje sean un elemento random, distintos dentro de un conjunto acotada de ciudades.
+La pseudo-aleatoridad se basaba en generar N vuelos aleatorios, es decir vuelos donde el punto de partida y el de aterrizaje sean un elemento al azar, distintos dentro de un conjunto acotada de ciudades.
 
 Tomamos la cota para la cantidad de ciudades como N/20. Esta cota se da para obtener instancias relativamente reales, y no es las cuales haya muchos vuelos que el algoritmo nunca recorra (estos casos deber\'ian tener un tiempo relativamente menor para obtener una soluci\'on).
 
+Para cada N:nº de vuelos se generar k' instancias, con k' = 3.
 
-Se tomo el tiempo de corrida para la misma instancia k veces, y de esas corridas se elegio el de menor tiempo de respuesta.
+Se llamo al algoritmo k veces, con k=20, y de esas corridas se elegio el de menor tiempo de respuesta.
 
-Luego para cada N distinto se obtuvo este gr\'afico.
+Para N moviendose entre 1 y 2, y k cantidad de corridas k=20 y k'=3, se obtuvo el siguiente gr\'afico.
 
 TODO
-
-Como se puede apreciar, la tendencia bajo esta pseudo-aleatoridad tambi\'es es polinomial en el tamaño de entrada.
-
 \newpage
 \subsubsection{Test de analisis de peor caso}
 
-Una instancia donde encontramos que la complejidad iba a tender a nuestra cota de O($N^{2}$), es cuando la ciudad inicial tiene N/2 vuelos, que aterrizan en C:Ciudad, y luego C tiene N/2 vuelos que van desde C hasta cualquier otra ciudad con un horario de despegue menor a cualquier vuelo desde la ciudad inicial.
+Una instancia donde encontramos que la complejidad iba a tender a nuestra cota de O($N^{2}$), es cuando una la ciudad inicial tiene N/2 vuelos, que aterrizan en C:Ciudad, y luego C tiene N/2 vuelos que van desde C hasta cualquier otra ciudad con un horario de despegue menor a cualquier vuelo desde la ciudad inicial.
 
 Como el algoritmo no puede saber en cada recursi\'on si va a existir un vuelo v\'alido para el T de entrada, tiene que iterar por todos los vuelos de C. Como desde inicio salen N/2 vuelos, la complejidad la funci\'on existeVuelo es $N^{2}$/4
-
-Creemos que toda instancia de problema, deber\'ia estar sobre esta cota, ya que si existiesen mas ciudades alcanzables desde inicio, dividiria en partes mas pequeñas la iteraci\'on de vuelos de cada ciudad.
-
-Si existiesen mas ciudades alcanzables desde inicio hasta C, los vuelos que lleguen a esas ciudades estar\'ian coloreados luego de alguna una llamada recursiva, por lo tanto tampoco se iterarian de nuevo.
 
 Para el gr\'afico siguiente se generaron entradas diferentes de N y para cada entrada se corri\'o el algoritmo un numero K de veces.
 
@@ -434,7 +421,11 @@ Para cada entrada de tamaño S, se tomo el tiempo de corrida de esa entrada, y d
 
 Como se corri\'o dentro de una m\'aquina deterministica, este es el mejor tiempo que se pudo obtener para cada instancia. 
 
-Luego obtuvimos se obtuvo el siguiente gr\'afico:
+Para un n\'umero N creciente de vuelos, se corrio 20 veces cada instancia de N elementos, y se calculo el menor tiempo de resoluci\'on de esas corridas.
+
+El n\'umero de vuelos se movi\'o entre 500 y 20000.
+
+Luego se obtuvo el siguiente gr\'afico:
 
 \begin{figure}[ht]
 	\begin{minipage}[t]{\linewidth}
@@ -442,12 +433,3 @@ Luego obtuvimos se obtuvo el siguiente gr\'afico:
 		\includegraphics[width=\textwidth]{GraficoDeVuelosYTiempo.jpg}
 	\end{minipage}	
 \end{figure}
-
-\subsubsection{Comparaci\'on}
-
-Luego se corrio y grafico la salida, nuestro algoritmo sobre una instancia de cada tipo aumentando el tamño de entrada en cada iteraci\'on. Nuevamente se corrio k veces cada instancia, y se tomo el tiempo m\'inimo de corrida para de esas interaciones. Si nuestras conclusiones eran correctas, las instancias aleatorias deb\'ian tener menor o igual tiempo de corrida que cualquiera del peor caso.
-
-Se obtuvo el siguiente gr\'afico:
-
-TODO
-
