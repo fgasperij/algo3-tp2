@@ -395,6 +395,17 @@ Los siguientes test fueron implementados:
 
 \subsubsection{Test de generaci\'on de casos pseudo aleatorios}
 
+Se genero instancias pseudo-aleatorias de entrada para el algoritmo.
+
+La pseudo-aleatoridad se basaba en generar N vuelos aleatorios, es decir vuelos donde el punto de partida y el de aterrizaje sean un elemento random, distintos dentro de un conjunto acotada de ciudades.
+
+Tomamos la cota para la cantidad de ciudades como N/20. Esta cota se da para obtener instancias relativamente reales, y no es las cuales haya muchos vuelos que el algoritmo nunca recorra (estos casos deber\'ian tener un tiempo relativamente menor para obtener una soluci\'on).
+
+
+Se tomo el tiempo de corrida para la misma instancia hasta k veces, y de esas corridas se elegio el de menor tiempo de corrida.
+
+Luego para cada N distinto se obtuvo este gr\'afico.
+
 TODO
 \newpage
 \subsubsection{Test de analisis de peor caso}
