@@ -7,9 +7,11 @@ set ytics 1
 set xlabel "Cantidad de vértices"
 set ylabel ""
 set title 'Comprobación de complejidad teórica para grafos aleatorios'
-plot 'tiemposPorCantidadDeVertices.txt' using 1:($2 / (log($1)*$1)) with lines linewidth 2 title "tiempo / (n log(n))"
+set key top left
+set key box
+plot 'tiemposPorCantidadDeVertices.txt' using 1:($2 / (log($1)*$1)) title "tiempo / (n log(n))"
 
 
 set output "complejidadConGrafosCompletos.jpg"
 set title 'Comprobación de complejidad teórica para grafos completos'
-plot 'tiemposPorCantidadDeVerticesParaGrafosCompletos.txt' using 1:($2 / (log($1)*$1)) with lines linewidth 2 title "tiempo / (n log(n))"
+plot 'tiemposPorCantidadDeVerticesParaGrafosCompletos.txt' using 1:($2 / (log($1)*$1)) title "tiempo / (n log(n))"

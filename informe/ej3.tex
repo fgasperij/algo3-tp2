@@ -113,7 +113,7 @@ Al finalizar el algoritmo, las aristas del circuito de la solución óptima qued
 
 \subsection{Demostración}
 
-Nuestro algoritmo encuentra un árbol generador mínimo del grafo de la red de computadoras, y le añade la arista (conexión) más barata de las que quedaron. Afirmamos que ésa es una solución óptima para el problema. Podemos caracterizar toda solución como un grafo conexo con exactamente un circuito simple, siendo el circuito el ``anillo'' y el resto de las aristas las conexiones restantes. Como el grafo es conexo, todas las computadoras estarán conectadas, por lo tanto se cumple con lo pedido.
+Nuestro algoritmo encuentra un árbol generador mínimo del grafo de la red de computadoras usando el algoritmo de Prim, y le añade la arista (conexión) más barata de las que quedaron. Afirmamos que ésa es una solución óptima para el problema de hallar un subgrafo generador conexo con exactamente un circuito simple.
 
 Veamos entonces que nuestro algoritmo devuelve una solución óptima. Demostraremos ésto por el absurdo, suponiendo que hay una solución estrictamente mejor que la nuestra. Pero primero, necesitamos demostrar el siguiente lema.
 
@@ -141,19 +141,23 @@ G - \left\{x\right\} = (V, X - \left\{x\right\})
 \end{notacion}
 
 \begin{correctitud}
-Sea $G = (V,X_G)$ el grafo de la red de computadoras, donde cada nodo es una computadora, y cada arista es una conexión. Sea $S = (V,X)$ subgrafo generador de $G$, la solución construida por nuestro algoritmo, esto es: $T = (V, X_T)$ un árbol generador mínimo de $G$, más agregar la arista $e \in \left\{x \in X_G - X_T \mid l(x) \leq l(x') \; \forall x' \in X_G - X_T \right\}$, esto es, $X = X_T \cup \left\{e\right\}$. $S$ es un grafo conexo con exactamente un circuito simple $C$ tal que $e \in C$, por definición equivalente de árbol. Entonces, no existe $S' = (V,X')$ subgrafo generador de $G$ conexo con exactamente un circuito simple, tal que $costo(S) > costo(S')$, siendo para cualquier grafo $G = (V,X)$
+Sea $G = (V,X_G)$ el grafo de la red de computadoras, donde cada nodo es una computadora, y cada arista es una conexión. Supongamos que existe solución al problema de encontrar un subgrafo generador conexo de $G$ con exactamente un circuito simple. Sea $S = (V,X)$ subgrafo generador de $G$, la solución construida por nuestro algoritmo, esto es: $T = (V, X_T)$ un árbol generador mínimo de $G$, más agregar la arista $e \in \left\{x \in X_G - X_T \mid l(x) \leq l(x') \; \forall x' \in X_G - X_T \right\}$, esto es, $X = X_T \cup \left\{e\right\}$. $S$ es un subgrafo generador conexo con exactamente un circuito simple $C$ tal que $e \in C$, por definición equivalente de árbol. Entonces, no existe $S' = (V,X')$ subgrafo generador de $G$ conexo con exactamente un circuito simple, tal que $costo(S) > costo(S')$, siendo para cualquier grafo $G = (V,X)$
 \begin{align*}
 costo(G) = \sum\limits_{\substack{x \in X}} l(x)
 \end{align*}
 \end{correctitud}
 \begin{proof}
 Supongamos que hay una solución mejor $S'$, esto es, $costo(S) > costo(S')$. \\
-\noindent Sea $e'$ cualquier arista del circuito de $S'$. Entonces,
+\noindent Sea $e'$ una arista cualquiera del circuito de $S'$. Entonces,
 \begin{align*}
 costo(S - \left\{e\right\}) \leq costo(S' - \left\{e'\right\})
 \end{align*}
 Esto es así porque $S - \left\{e\right\}$ es árbol generador mínimo y $S'$ sin una arista de su circuito es un árbol generador por el Lema \ref{lema_ej3}. \\
-Entonces, para toda arista $e'$ del circuito de $S'$, vale que $l(e') < l(e)$, de lo contrario sería $costo(S) \leq costo(S')$, absurdo.
+Entonces, para cada arista $e'$ del circuito de $S'$, debe ser $l(e) > l(e')$, de lo contrario sería $l(e) \leq l(e')$ y entonces tendríamos 
+\begin{align*}
+costo(S) = costo(S - \left\{e\right\}) + l(e) \leq costo(S' - \left\{e'\right\}) + l(e') = costo(S')
+\end{align*}
+lo cual no puede ocurrir por hipótesis.
 Además, cada arista del circuito de $S'$ debe estar en $S - \left\{e\right\}$, porque si no, el algoritmo no hubiera elegido a $e$ como arista final, habiendo una de menor costo. \\
 Por lo tanto, el circuito de $S'$ está en $S - \left\{e\right\}$. Pero entonces $S - \left\{e\right\}$ tiene un circuito siendo un árbol, absurdo. El absurdo provino de suponer que hay una solución mejor que la construida por nuestro algoritmo. \\
 Luego, la solución devuelta por nuestro algoritmo es óptima, y el algoritmo es correcto.
@@ -222,7 +226,7 @@ lo cual es estrictamente mejor que $O(n^3)$.
 
 \subsection{Tests de complejidad}
 
-Para testear la complejidad de peor caso, construimos 100 instancias aleatorias de grafos completos de $n$ vértices, para $n = {1, ... , 100}$ y calculamos el tiempo de ejecución 10 veces para cada instancia, tomando el mínimo. Luego, promediamos los tiempos de las 100 instancias para cada $n$. Finalmente, como afirmamos que la complejidad es $O(n^2 \log n)$, dividimos la muestra por $n \log n$ y esperamos ver una recta, lo cual efectivamente ocurre, como se aprecia a continuación:
+Para testear la complejidad de peor caso, construimos 1000 instancias aleatorias de grafos completos de $n$ vértices, para cada $n = {1, ... , 100}$ y calculamos el tiempo de ejecución 10 veces para cada instancia, tomando el mínimo. Luego, promediamos los tiempos de las 1000 instancias para cada $n$. Finalmente, como afirmamos que la complejidad es $O(n^2 \log n)$, dividimos la muestra por $n \log n$ y esperamos ver una recta, lo cual efectivamente ocurre, como se aprecia a continuación:
 
 \begin{figure}[H]
 	\begin{minipage}[t]{\linewidth}
@@ -233,8 +237,14 @@ Para testear la complejidad de peor caso, construimos 100 instancias aleatorias 
 	\end{minipage}
 \end{figure}
 
-Testeamos también para grafos aleatorios, esto es, para cada $n$ cantidad de vértices, hicimos aleatoria la cantidad de aristas (de $0$ a $\frac{n(n-1)}{2}$) y las seleccionamos también aleatoriamente. Aumentamos a 1000 las instancias, dejando igual el resto de la configuración. La complejidad en este caso esperamos que sea también $O(n^2 \log n)$, ya que elegimos la cantidad de aristas de manera uniforme, por lo que el valor esperado de aristas para $n$ vértices es $\frac{n(n-1)}{4} = O(n^2)$ y entonces valen las mismas conclusiones sacadas en la sección de análisis de complejidad. Como antes, dividimos la muestra por $n \log n$:
-
+Testeamos también para grafos aleatorios, esto es, para cada $n$ cantidad de vértices, hicimos aleatoria la cantidad de aristas (de $0$ a $\frac{n(n-1)}{2}$) y las seleccionamos también aleatoriamente (para ello, seleccionamos aleatoriamente un vértice que todavía tenga aristas disponibles, y elegimos una random). Usamos de nuevo 1000 instancias por cada $n$, calculando cada una diez veces y tomando el mínimo, y luego promediando estos. Como elegimos la cantidad de aristas usando $rand() \% (1 + n*(n-1)/2)$, entonces si definimos el espacio muestral $S = \left\{0, 1, ...,\frac{n(n-1)}{2}\right\}$ que representa la cantidad de aristas posibles, sabemos que vale $P(\left\{x\right\}) \approx \frac{1}{p} \; \forall x \in S$ donde $p = 1+\frac{n(n-1)}{2}$. Sea la variable aleatoria $X \colon S \to  \mathbb{R}$, $X(x) = x \; \forall x \in S$, entonces por todo lo anterior el valor esperado de $X$ es
+\begin{align*}
+E(X) &= \sum\limits_{\substack{x \in R_x}} x \; P(X = x) = \sum\limits_{\substack{x \in R_x}} x \; P(\left\{x\right\}) \\
+E(X) &= \sum\limits_{\substack{x \in R_x}} x \; \frac{1}{p} = \frac{1}{p} \sum\limits_{\substack{i = 0}}^{p-1} i \\
+E(X) &= \frac{(p-1)p}{2p} = \frac{p-1}{2} \\
+E(X) &= \frac{n(n-1)}{4}
+\end{align*}
+por lo que el valor esperado de aristas para $n$ vértices es $\frac{n(n-1)}{4} = O(n^2)$ y entonces valen las mismas conclusiones sacadas en la sección de análisis de complejidad, es decir, esperamos que la complejidad sea también $O(n^2 \log n)$. Como antes, dividimos la muestra por $n \log n$:
 \begin{figure}[H]
 	\begin{minipage}[t]{\linewidth}
 		\centering

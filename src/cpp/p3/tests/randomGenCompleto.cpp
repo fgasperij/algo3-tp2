@@ -8,7 +8,7 @@
 
 using namespace std;
 
-const int CANT_INSTANCIAS = 100;
+const int CANT_INSTANCIAS = 1000;
 const int MAX_VERTICES = 100;
 const int MAX_COSTO_ARISTA = 100;
 
