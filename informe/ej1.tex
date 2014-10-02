@@ -376,7 +376,7 @@ Por lo tanto obtener el itinerario cuesta a lo sumo O(N).
 Luego la complejidad total del algoritmo es O(N.Log(N)) + O($N^{2})$ + O(N) $=$ O($N^{2})$
 \subsection{Tests de complejidad}
 
-Para analizar y testear tannto complejidad como correctitud del algoritmo implementado para la resoluci\'on del problema  realizamos los siguientes testeos:
+Para analizar y testear tanto complejidad como correctitud del algoritmo implementado para la resoluci\'on del problema  realizamos los siguientes testeos:
 
 \begin{itemize}
   \item Test de casos borde.
@@ -396,7 +396,7 @@ Los siguientes test fueron implementados:
   \item 	testSinVuelos() $=$ Dado un conjunto vacio de vuelos, asegura la soluci\'on es "no".
   \item test2HorasDeDiferenecia() Asegura que la soluci\'on contenga 2hs de diferencia entre vuelo y vuelo.
   \item testCiclosALaMismaCiudad() $=$ Asegura dado que existe un ciclo a la misma ciudad, el algoritmo devuelva una soluci\'on v\'alida.
-  \item testLlegoPorUnCaminoAntesQueDerecho() $=$ Asegura que la soluci\'on sea un el camino que m\'as temprano llegue y no es m\'s corto.
+  \item testLlegoPorUnCaminoAntesQueDerecho() $=$ Asegura que la soluci\'on sea el camino que m\'as temprano llegue y no el m\'s corto.
   \item testCiclos $=$ Asegura dado que existen ciclos en mi conjunto de vuelos (es decir vuelvo a la misma ciudad desde un vuelo) el algoritmo retorne una soluci\'on v\'alida.
 \end{itemize}
 
@@ -409,17 +409,24 @@ La pseudo-aleatoridad se basaba en generar N vuelos aleatorios, es decir vuelos 
 Tomamos la cota para la cantidad de ciudades como N/20. Esta cota se da para obtener instancias relativamente reales, y no es las cuales haya muchos vuelos que el algoritmo nunca recorra (estos casos deber\'ian tener un tiempo relativamente menor para obtener una soluci\'on).
 
 
-Se tomo el tiempo de corrida para la misma instancia hasta k veces, y de esas corridas se elegio el de menor tiempo de corrida.
+Se tomo el tiempo de corrida para la misma instancia k veces, y de esas corridas se elegio el de menor tiempo de respuesta.
 
 Luego para cada N distinto se obtuvo este gr\'afico.
 
 TODO
+
+Como se puede apreciar, la tendencia bajo esta pseudo-aleatoridad tambi\'es es polinomial en el tamaño de entrada.
+
 \newpage
 \subsubsection{Test de analisis de peor caso}
 
-Una instancia donde encontramos que la complejidad iba a tender a nuestra cota de O($N^{2}$), es cuando una la ciudad inicial tiene N/2 vuelos, que aterrizan en C:Ciudad, y luego C tiene N/2 vuelos que van desde C hasta cualquier otra ciudad con un horario de despegue mayor a cualquier vuelo desde la ciudad inicial.
+Una instancia donde encontramos que la complejidad iba a tender a nuestra cota de O($N^{2}$), es cuando la ciudad inicial tiene N/2 vuelos, que aterrizan en C:Ciudad, y luego C tiene N/2 vuelos que van desde C hasta cualquier otra ciudad con un horario de despegue menor a cualquier vuelo desde la ciudad inicial.
 
 Como el algoritmo no puede saber en cada recursi\'on si va a existir un vuelo v\'alido para el T de entrada, tiene que iterar por todos los vuelos de C. Como desde inicio salen N/2 vuelos, la complejidad la funci\'on existeVuelo es $N^{2}$/4
+
+Creemos que toda instancia de problema, deber\'ia estar sobre esta cota, ya que si existiesen mas ciudades alcanzables desde inicio, dividiria en partes mas pequeñas la iteraci\'on de vuelos de cada ciudad.
+
+Si existiesen mas ciudades alcanzables desde inicio hasta C, los vuelos que lleguen a esas ciudades estar\'ian coloreados luego de alguna una llamada recursiva, por lo tanto tampoco se iterarian de nuevo.
 
 Para el gr\'afico siguiente se generaron entradas diferentes de N y para cada entrada se corri\'o el algoritmo un numero K de veces.
 
@@ -435,3 +442,12 @@ Luego obtuvimos se obtuvo el siguiente gr\'afico:
 		\includegraphics[width=\textwidth]{GraficoDeVuelosYTiempo.jpg}
 	\end{minipage}	
 \end{figure}
+
+\subsubsection{Comparaci\'on}
+
+Luego se corrio y grafico la salida, nuestro algoritmo sobre una instancia de cada tipo aumentando el tamño de entrada en cada iteraci\'on. Nuevamente se corrio k veces cada instancia, y se tomo el tiempo m\'inimo de corrida para de esas interaciones. Si nuestras conclusiones eran correctas, las instancias aleatorias deb\'ian tener menor o igual tiempo de corrida que cualquiera del peor caso.
+
+Se obtuvo el siguiente gr\'afico:
+
+TODO
+
