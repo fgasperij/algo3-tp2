@@ -3,21 +3,49 @@
 \subsection{Presentación del problema}
 En este problema nos presentan un tablero de dimensiones conocidas pero no acotadas
 del mismo tipo que el de ajedrez, es decir un tablero cuadriculado y cuadrado:\\
-\begin{center}
-(TODO insertar imagen de tablero cuadriculado y a los lados llaves que digan 'n')
-\end{center}
+\begin{figure}[H]
+	\begin{minipage}[t]{\linewidth}
+		\centering
+		\includegraphics[scale=0.5]{show_dimension.png}
+		%\caption{}
+		\label{fig:p2_complejidad_varia_k}
+	\end{minipage}
+\end{figure}
 y un conjunto de caballos, piezas de ajedrez, en casillas también conocidas, por ejemplo:\\
-\begin{center}
-(TODO insertar imagen del tablero con algunas casillas con una C)
-\end{center}
+\begin{figure}[H]
+	\begin{minipage}[t]{\linewidth}
+		\centering
+		\includegraphics[scale=0.5]{show_horses.png}
+		%\caption{}
+		\label{fig:p2_complejidad_varia_k}
+	\end{minipage}
+\end{figure}
 el objetivo es reunir a todos los caballos en una misma casilla del tablero con una cantidad
 de movimientos total, es decir sumando los movimientos que le tomo a cada uno de los caballos, mínima.
 Los movimientos permitidos a los caballos son los mismos que los impuestos por las reglas de ajedrez:\\
-\begin{center}
-(TODO insertar imagen del tablero con una C y x's en los casilleros donde puede saltar el caballo)
-\end{center}
-(TODO el renglón que está debajo de este debería ser el caption de la anterior imagen.)
-La C representa la casilla donde está ubicado el caballo y X los lugares a los cuales podría saltar.
+\begin{figure}[H]
+	\begin{minipage}[t]{\linewidth}
+		\centering
+		\includegraphics[scale=0.5]{show_jumps.png}
+		\caption{La C representa la casilla donde está ubicado el caballo y X los lugares a los cuales podría saltar.
+}
+		\label{fig:p2_complejidad_varia_k}
+	\end{minipage}
+\end{figure}
+A continuación mostramos un tablero de $4 \times 4$ en el cual los caballos comienzan en las esquinas, donde
+aparecen las C pequeñas. Los números dentro de las casillas representan la suma de las distancias de los caminos
+mínimos de cada uno de los caballos hasta esa casilla. Por ejemplo, la casilla correspondiente a la fila 2 y
+columna 4 (contando las filas desde abajo para arriba y las columnas de izquierda a derecha comenzando ambas desde 1)
+tiene el número 2 porque los dos caballos pueden llegar a ella en sólo 1 movimiento. Por lo tanto la suma en este
+caso es $1 +1 = 2$. Las casillas que están coloreadas se corresponden con las posibles soluciones de la instancia,
+son todas mínimas.
+\begin{figure}[H]
+	\begin{minipage}[t]{\linewidth}
+		\centering
+		\includegraphics[scale=0.5]{show_solution.png}
+		\label{fig:p2_complejidad_varia_k}
+	\end{minipage}
+\end{figure}
 
 \subsection{Resolución}
 Nosotros modelamos el problema con grafos con lo cual resultó equivalente al de camino mínimo 
@@ -31,10 +59,18 @@ hay caballos como nodos origen y existe una arista entre dos nodos, casillas, si
 puede ir con un salto de caballo. Cabe destacar que el salto de caballo es simétrico: si con un salto
 de caballo se puede ir de la casilla $a$ a la $b$ entonces necesariamente también se puede con un 
 salto de caballo ir de la casilla $b$ a la $a$:\\
-\begin{center}
-(TODO insertar imagen de un tablero con la C y las x's y al lado una imagen de un tablero con un puntito en
-la C y aristas que lo unen a puntitos donde estaban las x's)
-\end{center}
+\begin{figure}[H]
+	\begin{minipage}[t]{0.5\linewidth}
+		\centering
+		\includegraphics[scale=0.5]{show_jumps.png}
+		\label{fig:p2_complejidad_varia_k}
+	\end{minipage}
+	\begin{minipage}[t]{0.5\linewidth}
+		\centering
+		\includegraphics[scale=0.5]{show_graph.png}
+		\label{fig:p2_complejidad_varia_k}
+	\end{minipage}
+\end{figure}
 Los pasos para resolver el problema una vez modelado son bastante directos:
 \begin{enumerate}
   \item Recorrer el grafo una vez por cada caballo presente tomando como origen el nodo, casilla, en la 
@@ -93,6 +129,7 @@ al ser muy particulares no aportan mayor claridad a la presentación de la idea 
         \ENDIF
       \ENDWHILE
     \ENDWHILE
+    \caption{BFS}
   \end{algorithmic}
 \end{algorithm}
 
