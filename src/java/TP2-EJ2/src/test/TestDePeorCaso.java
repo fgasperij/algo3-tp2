@@ -31,8 +31,8 @@ public class TestDePeorCaso extends AbstractTestCase {
 	}
 
 	public void todosLosVuelosFallanEnLaSegundaCiudad() {
-		int step = 200;
-		int vuelosMax = 10000;
+		int step = 100;
+		int vuelosMax = 1000000;
 		int corridas = 20;
 		int inicio = 500;
 		for (int j = inicio; j < vuelosMax; j += step) {
@@ -58,7 +58,7 @@ public class TestDePeorCaso extends AbstractTestCase {
 				}
 				assert (sol.equals("no"));
 			}
-			System.out.println("vuelos: " + vuelos + " T: " + prom);
+			System.out.println(vuelos + "," + prom);
 		}
 
 	}

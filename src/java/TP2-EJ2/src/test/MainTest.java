@@ -6,8 +6,8 @@ public class MainTest {
 		// test constructor de aeropuertos
 
 		TestDeConstructorDeAeropuertos testDeConstructorDeAeropuertos = new TestDeConstructorDeAeropuertos();
-		testDeConstructorDeAeropuertos.testSinVuelos();
-		testDeConstructorDeAeropuertos.testSinMasCiudades();
+//		testDeConstructorDeAeropuertos.testSinVuelos();
+//		testDeConstructorDeAeropuertos.testSinMasCiudades();
 		// test de caso borde
 		TestDeCasoBorde testDeCasoBorde = new TestDeCasoBorde();
 		testDeCasoBorde.testUnVuelo();
