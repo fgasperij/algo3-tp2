@@ -301,24 +301,24 @@ chrono::microseconds algoritmo(unsigned int n, unsigned int m, unsigned int cost
         aristasCandidatasAGM.insert(*it);
     }
     
-    while (aristasAGM.size() < n - 1 && aristasCandidatasAGM.size() > 0 ) { // set::size() es O(1)
+    while (aristasAGM.size() < n - 1 && aristasCandidatasAGM.size() > 0 ) {
         auto iterAristaMinima = aristasCandidatasAGM.begin();
         Arista a = *iterAristaMinima;
-        aristasCandidatasAGM.erase(iterAristaMinima);           // Saco la arista del pool de candidatas, costo amortizado constante
-        pair<bool,Vertice> infoIncidencia = a.incideEnDosVertices(verticesAGM); // costo O(log |verticesAGM|)
-        if (infoIncidencia.first) {                             // Si incide en 2 vertices, no la puedo usar
+        aristasCandidatasAGM.erase(iterAristaMinima);           
+        pair<bool,Vertice> infoIncidencia = a.incideEnDosVertices(verticesAGM);
+        if (infoIncidencia.first) {                             
             continue;
         } else {
-            Vertice nuevo = infoIncidencia.second;              // Este es el vértice en el que no incide, no está en AGM
-            verticesAGM.insert(nuevo);                          // costo O(log |verticesAGM|)
-            aristasGrafo.erase(a);                              // Saco del grafo la arista, costo O(log |aristasGrafo|)
-            aristasAGM.insert(a);                               // costo O(log |verticesAGM|) porque un árbol tiene m = n - 1
+            Vertice nuevo = infoIncidencia.second;              
+            verticesAGM.insert(nuevo);                          
+            aristasGrafo.erase(a);                              
+            aristasAGM.insert(a);                               
             Vertice otro = a.dameElOtroVertice(nuevo);
-            aristasDeCadaVerticeAGM[nuevo].push_back(a);        // costo O(1)
+            aristasDeCadaVerticeAGM[nuevo].push_back(a);        
             aristasDeCadaVerticeAGM[otro].push_back(a);
             for(auto it = aristasDeCadaVertice[nuevo].begin(); it != aristasDeCadaVertice[nuevo].end(); it++) {
                 if (it->incideEnDosVertices(verticesAGM).first) {
-                    continue;                                   // Si estoy acá, iba a agregar una arista repetida o ya considerada
+                    continue;                                   
                 }
                 aristasCandidatasAGM.insert(*it);
             }
@@ -339,7 +339,7 @@ chrono::microseconds algoritmo(unsigned int n, unsigned int m, unsigned int cost
         aristasDeCadaVerticeAGM[segundo].push_back(menor);
         // Tengo que encontrar el circuito simple, esto es, el anillo
         infoVerticeDFS info[n];
-        DFS_visit(aristasDeCadaVerticeAGM, info, primero); // Llamo a DFS con un vértice que sé que está en el ciclo
+        DFS_visit(aristasDeCadaVerticeAGM, info, primero);
         if (info[primero].backEdges.size() != 1) {
             cout << "Hay algo mal, el vertice deberia tener exactamente un back edge." << endl;
         }
@@ -348,8 +348,8 @@ chrono::microseconds algoritmo(unsigned int n, unsigned int m, unsigned int cost
         aristasAGM.erase(backEdge);
         Vertice actual = backEdge.dameElOtroVertice(primero);
         while (actual != primero) {
-            aristasAGM.erase(info[actual].aristaAnterior);               // En aristasAGM van a quedar las aristas fuera del circuito
-            aristasAnillo.push_back(info[actual].aristaAnterior);        // Lo contrario para aristasAnillo
+            aristasAGM.erase(info[actual].aristaAnterior);
+            aristasAnillo.push_back(info[actual].aristaAnterior);
             actual = info[actual].verticeAnterior;
         }
     }
