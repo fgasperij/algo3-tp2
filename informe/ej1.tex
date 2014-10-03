@@ -374,32 +374,32 @@ Los siguientes test fueron implementados:
 
 \subsubsection{Test de an\'alisis de peor caso}
 
-Una instancia donde encontramos que la complejidad iba a tender a nuestra cota de O($N^{2}$), es cuando una la ciudad inicial tiene N/2 vuelos, que aterrizan en C:Ciudad, y luego C tiene N/2 vuelos que van desde C hasta cualquier otra ciudad con un horario de despegue menor a cualquier vuelo desde la ciudad inicial.
+Una instancia donde encontramos que la complejidad iba a tender a nuestra cota de O($N^{2}$), es cuando una la ciudad inicial tiene $\frac{N}{2}$ vuelos, que aterrizan en C:Ciudad, y luego C tiene $\frac{N}{2}$ vuelos que van desde C hasta cualquier otra ciudad con un horario de despegue menor a cualquier vuelo desde la ciudad inicial.
 
-Como el algoritmo no puede saber en cada recursi\'on si va a existir un vuelo v\'alido para el T de entrada, tiene que iterar por todos los vuelos de C. Como desde inicio salen N/2 vuelos, la complejidad la funci\'on existeVuelo es $N^{2}$/4
+Como el algoritmo no puede saber en cada recursi\'on si va a existir un vuelo v\'alido para el T de entrada, tiene que iterar por todos los vuelos de C. Como desde inicio salen $\frac{N}{2}$ vuelos, la complejidad de la funci\'on existeVuelo es $\frac{N^2}{4}$.
 
-Para el gr\'afico siguiente se generaron entradas diferentes de N y para cada entrada se corri\'o el algoritmo un numero K de veces.
+Para el gr\'afico siguiente se generaron entradas diferentes de $N$ y para cada entrada se corri\'o el algoritmo un numero K de veces.
 
 Para cada entrada de tamaño S, se tomo el tiempo de corrida de esa entrada, y de todas las instancias de igual tamaño se considero el menor tiempo en el que el algoritmo devolv\'ia una soluci\'on.
 
 Como se corri\'o dentro de una m\'aquina deterministica, este es el mejor tiempo que se pudo obtener para cada instancia. 
 
-Para un n\'umero N creciente de vuelos, se corrio 20 veces cada instancia de N elementos, y se calculo el menor tiempo de resoluci\'on de esas corridas.
+Para un n\'umero $N$ creciente de vuelos, se corrio 20 veces cada instancia de $N$ elementos, y se calculo el menor tiempo de resoluci\'on de esas corridas.
 
 El n\'umero de vuelos se movi\'o entre 500 y 20000.
 
 Luego se obtuvo el siguiente gr\'afico:
 
-\begin{figure}[ht]
+\begin{figure}[H]
 	\begin{minipage}[t]{\linewidth}
 		\centering
 		\includegraphics[width=\textwidth]{GraficoDeVuelosYTiempo.jpg}
 	\end{minipage}	
 \end{figure}
 
-Si se divide el gr\'afico por nuestra cota de $N^{2}$ deber\'ia quedar una recta como muestra el siguiente gr\'afico:
+Si se divide la muestra por $N$ deber\'ia quedar una recta como se observa en el siguiente gr\'afico:
 
-\begin{figure}[ht]
+\begin{figure}[H]
 	\begin{minipage}[t]{\linewidth}
 		\centering
 		\includegraphics[width=\textwidth]{GraficoDeVuelosPeorCasoDivididoN.jpg}
@@ -410,19 +410,19 @@ Si se divide el gr\'afico por nuestra cota de $N^{2}$ deber\'ia quedar una recta
 
 Se genero instancias pseudo-aleatorias de entrada para el algoritmo.
 
-La pseudo-aleatoridad se basaba en generar N vuelos aleatorios, es decir vuelos donde el punto de partida y el de aterrizaje sean un elemento al azar, distintos dentro de un conjunto acotada de ciudades.
+La pseudo-aleatoridad se basaba en generar $N$ vuelos aleatorios, es decir vuelos donde el punto de partida y el de aterrizaje sean un elemento al azar, distintos dentro de un conjunto acotada de ciudades.
 
-Tomamos la cota para la cantidad de ciudades como N/20. Esta cota se da para obtener instancias relativamente reales, y no es las cuales haya muchos vuelos que el algoritmo nunca recorra (estos casos deber\'ian tener un tiempo relativamente menor para obtener una soluci\'on).
+Tomamos la cota para la cantidad de ciudades como $\frac{N}{20}$. Esta cota se da para obtener instancias relativamente reales, y no es las cuales haya muchos vuelos que el algoritmo nunca recorra (estos casos deber\'ian tener un tiempo relativamente menor para obtener una soluci\'on).
 
-Para cada N:nº de vuelos se generar k' instancias, con k' = 3.
+Para cada $N$: nº de vuelos se generan $k'$ instancias, con $k' = 3$.
 
-Se llamo al algoritmo k veces, con k=20, y de esas corridas se elegio el de menor tiempo de respuesta.
+Se llamó al algoritmo $k$ veces, con $k=20$, y de esas corridas se eligió el de menor tiempo de ejecución.
 
-Se sumo el tiempo de las k' corridas.
+Se sumó el tiempo de las $k'$ corridas.
 
-Para N moviendose entre 500 y 40000, y k cantidad de corridas k=7 y k'=3, se obtuvo el siguiente gr\'afico.
+Para $N$ moviendose entre 500 y 40000, y $k$ cantidad de corridas $k=7$ y $k'=3$, se obtuvo el siguiente gr\'afico.
 
-\begin{figure}[ht]
+\begin{figure}[H]
 	\begin{minipage}[t]{\linewidth}
 		\centering
 		\includegraphics[width=\textwidth]{TiempoEnFuncionDeVuelosAleatorios.jpg}
@@ -435,7 +435,7 @@ Luego se corri\'o y grafic\'o la salida, nuestro algoritmo sobre una instancia d
 
 Se obtuvo el siguiente gr\'afico:
 
-\begin{figure}[ht]
+\begin{figure}[H]
 	\begin{minipage}[t]{\linewidth}
 		\centering
 		\includegraphics[width=\textwidth]{comparacionVuelosPeorAleatorio.jpg}
