@@ -52,7 +52,7 @@ Nosotros modelamos el problema con grafos con lo cual resultó equivalente al de
 con un origen y múltiples destinos en un grafo no dirigido sin peso en las aristas. 
 En este caso en particular las aristas no tienen peso porque el salto de un caballo siempre 
 tiene el mismo costo. En un grafo con las características mencionadas el algoritmo de 
-Breadth First Search (TODO agregar cita) obtiene el camino mínimo entre el origen tomado y el resto de los nodos,
+Breadth First Search \cite[p.~522]{cormen} obtiene el camino mínimo entre el origen tomado y el resto de los nodos,
 éste es el camino entre el origen y el nodo en árbol generado.
 El modelo consiste en tomar a las casillas del tablero como nodos del grafo, las casillas en las que 
 hay caballos como nodos origen y existe una arista entre dos nodos, casillas, si de una a la otra se
@@ -186,8 +186,7 @@ Finalmente, caracterizaremos a la solución del problema $S$:
 \begin{displaymath}
   S = \min_{v \in V} \left\{ {SP_{v}^{opt}} \right\}
 \end{displaymath}
-Nuestro algoritmo calcula el peso del camino mínimo entre cada uno de los orígenes y el resto de los nodos (TODO agregar cita
-al cormen capítulo 22 página 598). 
+Nuestro algoritmo calcula el peso del camino mínimo entre cada uno de los orígenes y el resto de los nodos \cite[p.~522]{cormen} 
 Luego suma en cada nodo $v$ el peso de los caminos mínimos desde cada uno de los orígenes hasta él que por \textbf{Lema 1} es
 igual a $SP_{v}^{opt}$. Por último, recorre todos los nodos y toma el mínimo entre todos los $SP_{v}^{opt}$ calculados
 lo cual es precisamente la solución que acabamos de definir.
@@ -203,14 +202,10 @@ Generar el grafo que modela la instancia del problema recibida tiene costo $O(\l
 Sólo precisamos una matriz de tamaño $n \times n$. Cada posición representa a un nodo y en él almacenaremos la suma
 de los caminos mínimos desde cada uno de los caballos hasta él. No es necesario guardar información acerca de las
 aristas del grafo porque, al ser el salto de del caballo un movimiento conocido, dado un nodo se pueden obtener sus vecinos
-en tiempo constante $O(1)$ calculándolos \textit{ad hoc}:
-\begin{center}
-(TODO insertar imagen de un tablero con una C en el centro, otra en un rincón y otra en una banda, indicando en cada
-caso los saltos posibles)
-\end{center}
+en tiempo constante $O(1)$ calculándolos \textit{ad hoc}.
 Tampoco es necesario guardar la distancia desde cada origen hasta cada uno de los nodos ya que sólo nos interesará
 la suma total sobre cada nodo. Por lo tanto, basta con ir sumando la distancia de cada uno de los orígenes hasta él.\\
-El costo de aplicar BFS es $O(\left\vert{E}\right\vert + \left\vert{V}\right\vert) = O(n^2 * 8 + n^2) = O(n^2)$ (TODO agregar cita al cormen) porque, 
+El costo de aplicar BFS es $O(\left\vert{E}\right\vert + \left\vert{V}\right\vert) = O(n^2 * 8 + n^2) = O(n^2)$ \cite[1]{cormen} porque, 
 como ya vimos, la cantidad de aristas del grafo está acotada por la cantidad de nodos, porque el caballo a lo sumo
 puede saltar a 8 casillas diferentes.\\
 Por último, buscar el mínimo tiene un costo $O(\left\vert{V}\right\vert) = O(n^2)$ porque simplemente consiste
