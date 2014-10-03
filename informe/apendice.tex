@@ -1,250 +1,686 @@
 \section{Apéndice: Códigos fuente}
 
-\subsection{Problema 2: Plan de vuelo }
+\subsection{Problema 1: Plan de vuelo }
 \lstset{language=Java,
-                keywordstyle=\color{blue},
-                stringstyle=\color{red},
-                commentstyle=\color{magenta},
-                morecomment=[l][\color{magenta}]{\#}
+        keywordstyle=\color{blue},
+        stringstyle=\color{red},
+        commentstyle=\color{magenta},
+        morecomment=[l][\color{magenta}]{\#}
 }
 \begin{lstlisting}[frame=single]
 public static String mejorVuelo(Aeropuerto[] aeropuertos) {
-		if (existeVuelo(aeropuertos, aeropuertos[0], aeropuertos[1], -2)) {
-			Vuelo min = aeropuertos[1].primeroEnLlegar();
-			StringBuilder builder = new StringBuilder();
-			builder.insert(0, " " + min.id());
-			String llegada = min.llegada() + " ";
-			int k = 1;
-			while (!min.origen().equals(aeropuertos[0])) {
-				min = min.origen().primeroEnLlegar();
-				builder.insert(0, " " + min.id());
-				k++;
-			}
-			return llegada + k + builder.toString();
-		}
-		return "no";
-	}
+  if (existeVuelo(aeropuertos, aeropuertos[0], aeropuertos[1], -2)) {
+    Vuelo min = aeropuertos[1].primeroEnLlegar();
+    StringBuilder builder = new StringBuilder();
+    builder.insert(0, " " + min.id());
+    String llegada = min.llegada() + " ";
+    int k = 1;
+    while (!min.origen().equals(aeropuertos[0])) {
+      min = min.origen().primeroEnLlegar();
+      builder.insert(0, " " + min.id());
+      k++;
+    }
+    return llegada + k + builder.toString();
+  }
+  return "no";
+}
 
-public static boolean existeVuelo(Aeropuerto[] aeropuertos,
-			Aeropuerto inicio, Aeropuerto destino, int t) {
-		if (inicio.equals(destino)) {
-			return true;
-		}
-		if (t + 2 <= inicio.obtenerUltimoVueloQueLlega()) {
-			return true;
-		}
-		boolean llego = false;
-		List<Vuelo> vuelos = inicio.vuelosQueSalen();
-		List<Vuelo> vuelosNoAnalizados = new LinkedList<Vuelo>();
-		inicio.vaciarVuelosQueSalen();
-		for (Vuelo vuelo : vuelos) {
-			if (vuelo.partida() >= t + 2) {
-				if (vuelo.color().equals(Color.BLANCO)) {
-					if (existeVuelo(aeropuertos, vuelo.destino(), destino,
-							vuelo.llegada())) {
-						vuelo.cambiarColor(Color.VERDE);
-						if (vuelo.destino().primeroEnLlegar() == null
-								|| vuelo.destino().primeroEnLlegar().llegada() > vuelo
-										.llegada()) {
-							vuelo.destino().agregarPrimeroEnLlegar(vuelo);
-						}
-						if (inicio.obtenerUltimoVueloQueLlega() < vuelo
-								.llegada()) {
-							inicio.cambiarUltimoVueloQueLlega(vuelo);
-						}
-						llego = true;
-					} else {
-						vuelo.cambiarColor(Color.ROJO);
-					}
-				}
-			} else {
-				vuelosNoAnalizados.add(vuelo);
-			}
-		}
-		inicio.asignarVuelosQueLlegan(vuelosNoAnalizados);
-		return llego;
-	}
-
+public static boolean existeVuelo(Aeropuerto[] aeropuertos, Aeropuerto inicio, Aeropuerto destino, int t) {
+  if (inicio.equals(destino)) {
+    return true;
+  }
+  if (t + 2 <= inicio.obtenerUltimoVueloQueLlega()) {
+    return true;
+  }
+  boolean llego = false;
+  List<Vuelo> vuelos = inicio.vuelosQueSalen();
+  List<Vuelo> vuelosNoAnalizados = new LinkedList<Vuelo>();
+  inicio.vaciarVuelosQueSalen();
+  for (Vuelo vuelo : vuelos) {
+    if (vuelo.partida() >= t + 2) {
+      if (vuelo.color().equals(Color.BLANCO)) {
+        if (existeVuelo(aeropuertos, vuelo.destino(), destino,
+            vuelo.llegada())) {
+          vuelo.cambiarColor(Color.VERDE);
+          if (vuelo.destino().primeroEnLlegar() == null
+              || vuelo.destino().primeroEnLlegar().llegada() > vuelo
+                  .llegada()) {
+            vuelo.destino().agregarPrimeroEnLlegar(vuelo);
+          }
+          if (inicio.obtenerUltimoVueloQueLlega() < vuelo
+              .llegada()) {
+            inicio.cambiarUltimoVueloQueLlega(vuelo);
+          }
+          llego = true;
+        } else {
+          vuelo.cambiarColor(Color.ROJO);
+        }
+      }
+    } else {
+      vuelosNoAnalizados.add(vuelo);
+    }
+  }
+  inicio.asignarVuelosQueLlegan(vuelosNoAnalizados);
+  return llego;
+}
 \end{lstlisting}
-\subsection{Problema 3: La comunidad del anillo}
+
+\subsection{Problema 2: Caballos salvajes}
+
 \subsubsection{Código del algoritmo que resuelve el problema}
 \lstset{language=C++,
-                keywordstyle=\color{blue},
-                stringstyle=\color{red},
-                commentstyle=\color{magenta},
-                morecomment=[l][\color{magenta}]{\#}
+        keywordstyle=\color{blue},
+        stringstyle=\color{red},
+        commentstyle=\color{magenta},
+        morecomment=[l][\color{magenta}]{\#}
+}
+\begin{lstlisting}[frame=single]
+#define NOT_VISITED -1
+
+struct Square {
+  Square() : row(0), column(0) {};
+  Square(int r, int c) : row(r), column(c) {};
+
+  int row;
+  int column;
+};
+
+struct Board {
+
+  vector<vector<int> > sums;
+  vector<vector<vector<int> > > squares;
+  
+  Board(int n, int horses) : 
+    squares(vector<vector<vector<int> > > (n, vector<vector<int> > (n, vector<int> (horses, NOT_VISITED) ) ) ), 
+        sums(vector<vector<int> > (n, vector<int>(n, 0)))
+  {};
+
+  bool is_marked(Square s, int horse)
+  {
+    if (squares[s.row][s.column][horse] == NOT_VISITED) {
+      return false;
+    }
+    
+    return true;
+  };
+
+  int get_distance(Square s, int horse) 
+  {
+    int dist = squares[s.row][s.column][horse];
+    return dist;
+  };
+
+  void set_distance(Square s, int horse, int d)
+  {
+    squares[s.row][s.column][horse] = d;
+    sums[s.row][s.column] += d;
+  };
+
+  void mostrar_sums()
+  {
+    cout << "SUMS" << endl;
+    for (int i = 0; i < sums.size(); i++) {
+     for (int j = 0; j < sums.size(); j++) {
+       cout << sums[i][j] << ' ';
+     }
+     cout << endl << endl;
+    }
+  };
+
+  vector<int> get_min_sum() 
+  {
+    int r, c;
+    int min = std::numeric_limits<int>::max();
+    for (int i = 0; i < sums.size(); i++) {
+     for (int j = 0; j < sums.size(); j++) {
+       if (min > sums[i][j]) {
+         min = sums[i][j];
+         r = i;
+         c = j;
+       }
+     }
+    }
+    
+    vector<int> result;
+    result.push_back(r);
+    result.push_back(c);
+    result.push_back(min);
+
+    return result;
+  };
+};
+
+int movements[][2] = {
+  {-2, -1}, {-2, 1}, {2, -1}, {2, 1},
+  {1, 2}, {1, -2}, {-1, 2}, {-1, -2}
+};
+
+queue<Square> get_neighbours(Square s, int n)
+{
+  queue<Square> neighbours;
+  int r, c;
+  for (int i = 0; i < 8; i++) {
+    r = s.row + movements[i][0];
+    c = s.column + movements[i][1];
+    if (r >= 0 && c >= 0 && r < n && c < n) {
+      neighbours.push(Square(r, c));
+    }
+  }
+
+  return neighbours;
+}
+
+void bfs(int horse, Square origin, Board &board)
+{
+  queue<Square> nodes_left;
+  nodes_left.push(origin);
+  board.set_distance(origin, horse, 0);
+
+  queue<Square> neighbours;
+  Square node;
+  int node_distance;
+  while (!nodes_left.empty()) {
+    node = nodes_left.front();
+    node_distance = board.get_distance(node, horse);
+    nodes_left.pop();
+
+    neighbours = get_neighbours(node, board.squares.size());
+
+    while (!neighbours.empty()) {
+      Square neighbour = neighbours.front();
+      neighbours.pop();
+      if (!board.is_marked(neighbour, horse)) {
+        board.set_distance(neighbour, horse, node_distance+1); 
+        nodes_left.push(neighbour);
+      }
+    }
+  }
+}
+
+int main() {
+ int n, k;
+
+ cin >> n >> k;
+ Board board(n, k);
+ int r, c;
+ for (int i = 0; i < k; i++) {
+   cin >> r >> c;
+   bfs(i, Square(r, c), board);
+ }
+
+ vector<int> result = board.get_min_sum();
+
+ cout << result[0] << ' ' << result[1] << ' ' << result[2] << endl;
+
+ return 0;
+}
+\end{lstlisting}
+
+\subsubsection{Código del generador de instancias}
+\lstset{language=C++,
+        keywordstyle=\color{blue},
+        stringstyle=\color{red},
+        commentstyle=\color{magenta},
+        morecomment=[l][\color{magenta}]{\#}
+}
+\begin{lstlisting}[frame=single]
+int main() {
+  // test configuration
+  const int instances = 200;
+  const int start = 4;
+  const bool vary_n = false;
+  const int constant_horses = 5;
+  const int constant_n = 100;
+  srand(time(NULL));
+
+  std::ofstream ofs;
+  std::string test_file;
+  if (vary_n) {
+    test_file = "tests_n.in";
+  } else {
+    test_file = "tests_k.in";
+  }
+  ofs.open(test_file.c_str(), std::ofstream::out);
+
+  ofs << instances << std::endl;
+
+  for (int i = 2; i < instances; i++) {
+    if (vary_n) {
+      for (int l = 0; l < 3; l++) {
+        for (int m = 0; m < 10; m++) {
+          ofs << i << ' ' << constant_horses+5*l << std::endl;
+          for (int j = 0; j < constant_horses+5*l; j++) {
+            ofs << rand() % i << ' ' << rand() % i << std::endl;
+          }
+        }
+      }
+    } else {
+      for (int l = 0; l < 3; l++) {
+        for (int m = 0; m < 10; m++) {
+          ofs << 40+l*30 << ' ' << i << std::endl;
+          for (int j = 0; j < i; j++) {
+            ofs << rand() % 40+l*30 << ' ' << rand() % 40+l*30 << std::endl;
+          }
+        }
+      }
+    }
+  }
+
+  ofs.close();
+
+  return 0;
+}
+\end{lstlisting}
+
+\subsubsection{Código del tester}
+\lstset{language=C++,
+        keywordstyle=\color{blue},
+        stringstyle=\color{red},
+        commentstyle=\color{magenta},
+        morecomment=[l][\color{magenta}]{\#}
+}
+\begin{lstlisting}[frame=single]
+int main() {
+ // configuration
+ const bool test_n = false;
+
+ std::string in_file;
+ std::string out_file;
+ if (test_n) {
+   in_file = "tests_n.in";
+   out_file = "tests_n.out";
+ } else {
+   in_file = "tests_k.in";
+   out_file = "tests_k.out";
+ }
+
+ std::ifstream ifs;
+ ifs.open(in_file.c_str(), std::ifstream::in);
+ std::ofstream ofs;
+ ofs.open(out_file.c_str(), std::ofstream::out);
+
+ int instances;
+
+ ifs >> instances;
+
+ for (int i = 4; i < instances; i++) {
+   std::cout << "PROCESSING INSTANCE " << i << endl;
+   int n, k;
+   ifs >> n >> k;
+   std::cout << "n: " << n << " k: " << k << endl;
+
+   vector<vector<int> > horses (k, vector<int>(2, -1));
+   for (int h = 0; h < k; h++) {
+     ifs >> horses[h][0] >> horses[h][1];
+   }
+
+   long long int minimum = std::chrono::microseconds::max().count();
+   for (int j = 0; j < 2; j++) {
+     std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+
+     Board board(n, k);
+     
+     for (int l = 0; l < k; l++) {
+       bfs(l, Square(horses[l][0], horses[l][1]), board);
+     }
+     
+
+     vector<int> result = board.get_min_sum();
+
+     std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+
+     long long int current = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+     if (current < minimum) {
+       minimum = current;
+     }
+   }
+
+   if (test_n) {
+     ofs << n << ' ' << minimum/n << endl;
+   } else {
+     ofs << k << ' ' << minimum << endl;
+   }
+ }
+
+ return 0;
+}
+\end{lstlisting}
+
+\subsection{Problema 3: La comunidad del anillo}
+
+\subsubsection{Código del algoritmo que resuelve el problema}
+\lstset{language=C++,
+        keywordstyle=\color{blue},
+        stringstyle=\color{red},
+        commentstyle=\color{magenta},
+        morecomment=[l][\color{magenta}]{\#}
 }
 \begin{lstlisting}[frame=single]
 typedef int Vertice;
 
 class Arista {
-    private:
-        Vertice v1;
-        Vertice v2;
-        int l;
-    public:
-        Arista() : v1(-1), v2(-1), l(-1){}
-        Arista(const Vertice & v1, const Vertice & v2, const int & l) : v1(v1), v2(v2), l(l){}
-        int costo() const {
-            return l;
-        }
-        bool incideEn(Vertice v) const {
-            return (v == v1 || v == v2) ? true : false;
-        }
-        pair<bool,Vertice> incideEnDosVertices(const set<Vertice> & conjVertices) const {
-            pair<bool,Vertice> res;
-            int incideEnV1 = conjVertices.count(v1);
-            int incideEnV2 = conjVertices.count(v2);
-            if (incideEnV1 + incideEnV2 == 2) {
-                res.first = true;
-            } else {
-                res.first = false;
-                res.second = (incideEnV1 == 0) ? v1 : v2;
-            }
-            return res;
-        }
-        pair<Vertice,Vertice> dameVertices() const {
-            return pair<Vertice,Vertice>(v1,v2);
-        }
-        Vertice dameVerticeUno() const {
-            return v1;
-        }
-        Vertice dameVerticeDos() const {
-            return v2;
-        }
-        Vertice dameElOtroVertice(Vertice v) const { // Requiere que (v == v1) ó (v == v2)
-            return (v == v1) ? v2 : v1;
-        }
+  private:
+    Vertice v1;
+    Vertice v2;
+    int l;
+  public:
+    Arista() : v1(-1), v2(-1), l(-1){}
+    Arista(const Vertice & v1, const Vertice & v2, const int & l) : v1(v1), v2(v2), l(l){}
+    int costo() const {
+      return l;
+    }
+    bool incideEn(Vertice v) const {
+      return (v == v1 || v == v2) ? true : false;
+    }
+    pair<bool,Vertice> incideEnDosVertices(const set<Vertice> & conjVertices) const {
+      pair<bool,Vertice> res;
+      int incideEnV1 = conjVertices.count(v1);
+      int incideEnV2 = conjVertices.count(v2);
+      if (incideEnV1 + incideEnV2 == 2) {
+        res.first = true;
+      } else {
+        res.first = false;
+        res.second = (incideEnV1 == 0) ? v1 : v2;
+      }
+      return res;
+    }
+    pair<Vertice,Vertice> dameVertices() const {
+      return pair<Vertice,Vertice>(v1,v2);
+    }
+    Vertice dameVerticeUno() const {
+      return v1;
+    }
+    Vertice dameVerticeDos() const {
+      return v2;
+    }
+    Vertice dameElOtroVertice(Vertice v) const { // Requiere que (v == v1) ó (v == v2)
+      return (v == v1) ? v2 : v1;
+    }
 };
 
 struct comparacionArista {
-    bool operator() (const Arista & lhs, const Arista & rhs) const {
-        // Quiero que:
-        // Si tienen = costo, ordene por costo
-        // Si tienen != costo, ordene por vértices (excepto el caso particular en que sean e = (a,b,c), e' = (b,a,c); entonces e = e')
-        if (lhs.costo() == rhs.costo()) { // (x1,y1,c), (x2,y2,c)
-            if( lhs.dameVerticeUno() == rhs.dameVerticeUno() ) { // (a,y1,c), (a,y2,c)
-                return lhs.dameVerticeDos() < rhs.dameVerticeDos();
-            } else { // (a,y1,c), (b,y2,c) con a != b
-                if (lhs.dameVerticeUno() == rhs.dameVerticeDos() && lhs.dameVerticeDos() == rhs.dameVerticeUno()) {
-                    return false; // (a,b,c) y (b,a,c) son la misma arista
-                } else {
-                    return lhs.dameVerticeUno() < rhs.dameVerticeUno();
-                }
-            }
+  bool operator() (const Arista & lhs, const Arista & rhs) const {
+    // Quiero que:
+    // Si tienen = costo, ordene por costo
+    // Si tienen != costo, ordene por vértices (excepto el caso particular en que sean e = (a,b,c), e' = (b,a,c); entonces e = e')
+    if (lhs.costo() == rhs.costo()) { // (x1,y1,c), (x2,y2,c)
+      if( lhs.dameVerticeUno() == rhs.dameVerticeUno() ) { // (a,y1,c), (a,y2,c)
+        return lhs.dameVerticeDos() < rhs.dameVerticeDos();
+      } else { // (a,y1,c), (b,y2,c) con a != b
+        if (lhs.dameVerticeUno() == rhs.dameVerticeDos() && lhs.dameVerticeDos() == rhs.dameVerticeUno()) {
+          return false; // (a,b,c) y (b,a,c) son la misma arista
         } else {
-            return lhs.costo() < rhs.costo();
+          return lhs.dameVerticeUno() < rhs.dameVerticeUno();
         }
+      }
+    } else {
+      return lhs.costo() < rhs.costo();
     }
+  }
 };
 
 enum Color {BLANCO, GRIS, NEGRO};
 
 struct infoVerticeDFS {
-    Vertice verticeAnterior;
-    Arista aristaAnterior;
-    Color estado;
-    list<Arista> backEdges;
-    infoVerticeDFS() : verticeAnterior(-1), aristaAnterior(), estado(BLANCO), backEdges() {}
+  Vertice verticeAnterior;
+  Arista aristaAnterior;
+  Color estado;
+  list<Arista> backEdges;
+  infoVerticeDFS() : verticeAnterior(-1), aristaAnterior(), estado(BLANCO), backEdges() {}
 };
 
 void DFS_visit(vector< list<Arista> > & aristasDeCadaVerticeAGM, infoVerticeDFS * info, Vertice actual) {
-    info[actual].estado = GRIS;
-    for (auto it = aristasDeCadaVerticeAGM[actual].begin(); it != aristasDeCadaVerticeAGM[actual].end(); it++) {
-        Vertice nuevoActual = it->dameElOtroVertice(actual);
-        if (info[nuevoActual].estado == BLANCO) {
-            info[nuevoActual].aristaAnterior = *it;
-            info[nuevoActual].verticeAnterior = actual;
-            DFS_visit(aristasDeCadaVerticeAGM, info, nuevoActual);
-        } else if (info[nuevoActual].estado == GRIS) {
-            if (nuevoActual == info[actual].verticeAnterior) {
-                /* Si estoy acá es porque estaba volviendo por la misma arista que vine (formando un circuito NO simple) */
-            } else {
-                /* El nuevo vertice ya habia sido visitado, entonces hay back edge */
-                info[nuevoActual].backEdges.push_back(*it);
-            }
-        }
+  info[actual].estado = GRIS;
+  for (auto it = aristasDeCadaVerticeAGM[actual].begin(); it != aristasDeCadaVerticeAGM[actual].end(); it++) {
+    Vertice nuevoActual = it->dameElOtroVertice(actual);
+    if (info[nuevoActual].estado == BLANCO) {
+      info[nuevoActual].aristaAnterior = *it;
+      info[nuevoActual].verticeAnterior = actual;
+      DFS_visit(aristasDeCadaVerticeAGM, info, nuevoActual);
+    } else if (info[nuevoActual].estado == GRIS) {
+      if (nuevoActual == info[actual].verticeAnterior) {
+        /* Si estoy acá es porque estaba volviendo por la misma arista que vine (formando un circuito NO simple) */
+      } else {
+        /* El nuevo vertice ya habia sido visitado, entonces hay back edge */
+        info[nuevoActual].backEdges.push_back(*it);
+      }
     }
-    info[actual].estado = NEGRO;
+  }
+  info[actual].estado = NEGRO;
 }
 
 int main(int argc, const char* argv[]) {
-    unsigned int n, m, costoTotal = 0; // n = #vertices, m = #aristas
-    vector< list<Arista> > aristasDeCadaVertice;
-    vector< list<Arista> > aristasDeCadaVerticeAGM;
-    set<Arista, comparacionArista> aristasGrafo;
-    set<Vertice> verticesAGM;
-    set<Arista, comparacionArista> aristasAGM;
-    set<Arista, comparacionArista> aristasCandidatasAGM;
-    list<Arista> aristasAnillo;
-    
-    cin >> n >> m;
-    
-    if (m < n) { // Si hay menos de n aristas, no existe solución (ver Correctitud)
-        cout << "no" << endl;
-        return 0;
-    }
-    
-    for (unsigned int i = 0; i < n; i++) {
-        aristasDeCadaVertice.push_back(list<Arista>());
-        aristasDeCadaVerticeAGM.push_back(list<Arista>());
-    }
-    
-    for (unsigned int i = 0; i < m; i++) {
-        Vertice v1, v2;
-        int l;
-        cin >> v1 >> v2 >> l;
-        v1--; v2--; // Como los equipos van de 1 a n, resto uno para que v1 y v2 vayan de 0 a n-1. Al devolver la solución sumo 1 y listo
-        Arista a(v1, v2, l);
-        aristasDeCadaVertice[v1].push_back(a);
-        aristasDeCadaVertice[v2].push_back(a);
-        aristasGrafo.insert(a);
-    }
-    
-    // Arranco poniendo el vértice 0 en verticesAGM, y sus aristas en aristasCandidatasAGM
-    verticesAGM.insert(0);
-    for(auto it = aristasDeCadaVertice[0].begin(); it != aristasDeCadaVertice[0].end(); it++) {
-        aristasCandidatasAGM.insert(*it);
-    }
-    
-    while (aristasAGM.size() < n - 1 && aristasCandidatasAGM.size() > 0 ) {
-        auto iterAristaMinima = aristasCandidatasAGM.begin();
-        Arista a = *iterAristaMinima;
-        aristasCandidatasAGM.erase(iterAristaMinima);
-        pair<bool,Vertice> infoIncidencia = a.incideEnDosVertices(verticesAGM);
-        if (infoIncidencia.first) { // Si incide en 2 vertices, no la puedo usar
-            continue;
-        } else {
-            Vertice nuevo = infoIncidencia.second; // Este es el vértice en el que no incide, no está en AGM
-            verticesAGM.insert(nuevo); 
-            aristasGrafo.erase(a);
-            aristasAGM.insert(a); 
-            Vertice otro = a.dameElOtroVertice(nuevo);
-            aristasDeCadaVerticeAGM[nuevo].push_back(a); 
-            aristasDeCadaVerticeAGM[otro].push_back(a);
-            for(auto it = aristasDeCadaVertice[nuevo].begin(); it != aristasDeCadaVertice[nuevo].end(); it++) {
-                if (it->incideEnDosVertices(verticesAGM).first) {
-                    continue; // Si estoy acá, iba a agregar una arista repetida o ya considerada
-                }
-                aristasCandidatasAGM.insert(*it);
-            }
+  unsigned int n, m, costoTotal = 0; // n = #vertices, m = #aristas
+  vector< list<Arista> > aristasDeCadaVertice;
+  vector< list<Arista> > aristasDeCadaVerticeAGM;
+  set<Arista, comparacionArista> aristasGrafo;
+  set<Vertice> verticesAGM;
+  set<Arista, comparacionArista> aristasAGM;
+  set<Arista, comparacionArista> aristasCandidatasAGM;
+  list<Arista> aristasAnillo;
+  
+  cin >> n >> m;
+  
+  if (m < n) { // Si hay menos de n aristas, no existe solución (ver Correctitud)
+    cout << "no" << endl;
+    return 0;
+  }
+  
+  for (unsigned int i = 0; i < n; i++) {
+    aristasDeCadaVertice.push_back(list<Arista>());
+    aristasDeCadaVerticeAGM.push_back(list<Arista>());
+  }
+  
+  for (unsigned int i = 0; i < m; i++) {
+    Vertice v1, v2;
+    int l;
+    cin >> v1 >> v2 >> l;
+    v1--; v2--; // Como los equipos van de 1 a n, resto uno para que v1 y v2 vayan de 0 a n-1. Al devolver la solución sumo 1 y listo
+    Arista a(v1, v2, l);
+    aristasDeCadaVertice[v1].push_back(a);
+    aristasDeCadaVertice[v2].push_back(a);
+    aristasGrafo.insert(a);
+  }
+  
+  // Arranco poniendo el vértice 0 en verticesAGM, y sus aristas en aristasCandidatasAGM
+  verticesAGM.insert(0);
+  for(auto it = aristasDeCadaVertice[0].begin(); it != aristasDeCadaVertice[0].end(); it++) {
+    aristasCandidatasAGM.insert(*it);
+  }
+  
+  while (aristasAGM.size() < n - 1 && aristasCandidatasAGM.size() > 0 ) {
+    auto iterAristaMinima = aristasCandidatasAGM.begin();
+    Arista a = *iterAristaMinima;
+    aristasCandidatasAGM.erase(iterAristaMinima);
+    pair<bool,Vertice> infoIncidencia = a.incideEnDosVertices(verticesAGM);
+    if (infoIncidencia.first) { // Si incide en 2 vertices, no la puedo usar
+      continue;
+    } else {
+      Vertice nuevo = infoIncidencia.second; // Este es el vértice en el que no incide, no está en AGM
+      verticesAGM.insert(nuevo); 
+      aristasGrafo.erase(a);
+      aristasAGM.insert(a); 
+      Vertice otro = a.dameElOtroVertice(nuevo);
+      aristasDeCadaVerticeAGM[nuevo].push_back(a); 
+      aristasDeCadaVerticeAGM[otro].push_back(a);
+      for(auto it = aristasDeCadaVertice[nuevo].begin(); it != aristasDeCadaVertice[nuevo].end(); it++) {
+        if (it->incideEnDosVertices(verticesAGM).first) {
+          continue; // Si estoy acá, iba a agregar una arista repetida o ya considerada
         }
+        aristasCandidatasAGM.insert(*it);
+      }
     }
-    
-    if (aristasAGM.size() < n - 1) { // Si el árbol no tiene n - 1 aristas, no es generador (el grafo original no era conexo)
-        cout << "no" << endl;
-        return 0;
+  }
+  
+  if (aristasAGM.size() < n - 1) { // Si el árbol no tiene n - 1 aristas, no es generador (el grafo original no era conexo)
+    cout << "no" << endl;
+    return 0;
+  }
+  
+  // Ahora agrego la arista con menor peso:
+  if (aristasGrafo.size() == 0) { // En aristasGrafo quedaron las aristas que no puse en el AGM
+    cout << "no" << endl;
+    return 0;
+  }
+  Arista menor = *aristasGrafo.begin();
+  aristasAGM.insert(menor);
+  for (auto it = aristasAGM.begin(); it != aristasAGM.end(); it++) {
+    costoTotal += it->costo();
+  }
+  Vertice primero = menor.dameVerticeUno();
+  Vertice segundo = menor.dameVerticeDos();
+  aristasDeCadaVerticeAGM[primero].push_back(menor);
+  aristasDeCadaVerticeAGM[segundo].push_back(menor);
+  // Tengo que encontrar el circuito simple, esto es, el anillo
+  infoVerticeDFS info[n];
+  DFS_visit(aristasDeCadaVerticeAGM, info, primero); // Llamo a DFS con un vértice que sé que está en el ciclo
+  if (info[primero].backEdges.size() != 1) {
+    cout << "Hay algo mal, el vertice deberia tener exactamente un back edge." << endl;
+    return 1;
+  }
+  Arista backEdge = info[primero].backEdges.front();
+  aristasAnillo.push_back(backEdge);
+  aristasAGM.erase(backEdge);
+  Vertice actual = backEdge.dameElOtroVertice(primero);
+  while (actual != primero) {
+    aristasAGM.erase(info[actual].aristaAnterior); // En aristasAGM van a quedar las aristas fuera del circuito
+    aristasAnillo.push_back(info[actual].aristaAnterior); // Lo contrario para aristasAnillo
+    actual = info[actual].verticeAnterior;
+  }
+  cout << costoTotal << " " << aristasAnillo.size() << " " << aristasAGM.size() << endl;
+  for (auto it = aristasAnillo.begin(); it != aristasAnillo.end(); it++) {
+    cout << it->dameVerticeUno() + 1 << " " << it->dameVerticeDos() + 1 << endl;
+  }
+  for (auto it = aristasAGM.begin(); it != aristasAGM.end(); it++) {
+    cout << it->dameVerticeUno() + 1 << " " << it->dameVerticeDos() + 1 << endl;
+  }
+  
+  return 0;
+}
+\end{lstlisting}
+
+\subsubsection{Código del generador de grafos aleatorios}
+\lstset{language=C++,
+        keywordstyle=\color{blue},
+        stringstyle=\color{red},
+        commentstyle=\color{magenta},
+        morecomment=[l][\color{magenta}]{\#}
+}
+\begin{lstlisting}[frame=single]
+Vertice seleccionarVerticeRandom(set<Vertice> & conjunto) {
+  int i = rand() % conjunto.size();
+  auto it = conjunto.begin();
+  for(int j = 0; j < i; j++) it++;
+  return *it;
+}
+
+int main(int argc, const char* argv[]) {
+  srand(time(NULL) + getpid()); // Seedeo
+  for (int n = 1; n <= MAX_VERTICES; n++) {
+    for (int i = 1; i <= CANT_INSTANCIAS; i++) {
+      int m = rand() % (1 + n * (n - 1) / 2); // m es un valor aleatorio entre 0 y n(n-1)/2
+      cout << n << " " << m << endl;
+      set<Vertice> vertices; // Acá voy a tener el conjunto de vértices que todavía al menos una arista disponible.
+      for (int i = 0; i < n; i++) {
+        vertices.insert(i); // Los vertices van a ser enteros entre 0 y n-1, tengo que sumarles uno al imprimir
+      }
+      vector< set<Vertice> > vecinosPosibles(n);
+      for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+          if (i != j) {
+            vecinosPosibles[i].insert(j);
+          }
+        }
+      }
+      while (m > 0) {
+        Vertice v = seleccionarVerticeRandom(vertices);
+        if (vecinosPosibles[v].size() == 0) {
+          vertices.erase(v);
+        } else {
+          m--;
+          Vertice w = seleccionarVerticeRandom(vecinosPosibles[v]);
+          vecinosPosibles[v].erase(w);
+          vecinosPosibles[w].erase(v);
+          cout << v + 1 << " " << w + 1 << " " << (rand() % 100) + 1 << endl;
+        }
+      }
     }
-    
-    // Ahora agrego la arista con menor peso:
-    if (aristasGrafo.size() == 0) { // En aristasGrafo quedaron las aristas que no puse en el AGM
-        cout << "no" << endl;
-        return 0;
+  }
+}
+\end{lstlisting}
+
+\subsubsection{Código del generador de grafos completos}
+\lstset{language=C++,
+        keywordstyle=\color{blue},
+        stringstyle=\color{red},
+        commentstyle=\color{magenta},
+        morecomment=[l][\color{magenta}]{\#}
+}
+\begin{lstlisting}[frame=single]
+int main(int argc, const char* argv[]) {
+  srand(time(NULL) + getpid()); // Seedeo
+  for (int n = 1; n <= MAX_VERTICES; n++) {
+    for (int i = 1; i <= CANT_INSTANCIAS; i++) {
+      int m = n * (n - 1) / 2;
+      cout << n << " " << m << endl;
+      for (int v = 1; v <= n; v++) {
+        for (int a = 1; a <= (n-1) - (v-1); a++) {
+          cout << v << " " << (v + a) << " " << (rand() % 100) + 1 << endl;
+        }
+      }
     }
+  }
+}
+\end{lstlisting}
+
+\subsubsection{Código del tester (sólo lo relevante, el resto es igual)}
+\lstset{language=C++,
+        keywordstyle=\color{blue},
+        stringstyle=\color{red},
+        commentstyle=\color{magenta},
+        morecomment=[l][\color{magenta}]{\#}
+}
+\begin{lstlisting}[frame=single]
+chrono::microseconds algoritmo(unsigned int n, unsigned int m, unsigned int costoTotal, vector< list<Arista> > aristasDeCadaVertice, vector< list<Arista> > aristasDeCadaVerticeAGM, set<Arista, comparacionArista> aristasGrafo, set<Vertice> verticesAGM, set<Arista, comparacionArista> aristasAGM, set<Arista, comparacionArista> aristasCandidatasAGM, list<Arista> aristasAnillo) 
+{
+  auto start_time = chrono::high_resolution_clock::now();
+  // Arranco poniendo el vértice 0 en verticesAGM, y sus aristas en aristasCandidatasAGM
+  verticesAGM.insert(0);
+  for(auto it = aristasDeCadaVertice[0].begin(); it != aristasDeCadaVertice[0].end(); it++) {
+    aristasCandidatasAGM.insert(*it);
+  }
+  
+  while (aristasAGM.size() < n - 1 && aristasCandidatasAGM.size() > 0 ) {
+    auto iterAristaMinima = aristasCandidatasAGM.begin();
+    Arista a = *iterAristaMinima;
+    aristasCandidatasAGM.erase(iterAristaMinima);       
+    pair<bool,Vertice> infoIncidencia = a.incideEnDosVertices(verticesAGM);
+    if (infoIncidencia.first) {               
+      continue;
+    } else {
+      Vertice nuevo = infoIncidencia.second;        
+      verticesAGM.insert(nuevo);              
+      aristasGrafo.erase(a);                
+      aristasAGM.insert(a);                 
+      Vertice otro = a.dameElOtroVertice(nuevo);
+      aristasDeCadaVerticeAGM[nuevo].push_back(a);    
+      aristasDeCadaVerticeAGM[otro].push_back(a);
+      for(auto it = aristasDeCadaVertice[nuevo].begin(); it != aristasDeCadaVertice[nuevo].end(); it++) {
+        if (it->incideEnDosVertices(verticesAGM).first) {
+          continue;                   
+        }
+        aristasCandidatasAGM.insert(*it);
+      }
+    }
+  }
+  
+  if ( (aristasAGM.size() < n - 1) || (aristasGrafo.size() == 0)) {
+    // No hay solucion
+  } else {
     Arista menor = *aristasGrafo.begin();
     aristasAGM.insert(menor);
     for (auto it = aristasAGM.begin(); it != aristasAGM.end(); it++) {
-        costoTotal += it->costo();
+      costoTotal += it->costo();
     }
     Vertice primero = menor.dameVerticeUno();
     Vertice segundo = menor.dameVerticeDos();
@@ -252,176 +688,24 @@ int main(int argc, const char* argv[]) {
     aristasDeCadaVerticeAGM[segundo].push_back(menor);
     // Tengo que encontrar el circuito simple, esto es, el anillo
     infoVerticeDFS info[n];
-    DFS_visit(aristasDeCadaVerticeAGM, info, primero); // Llamo a DFS con un vértice que sé que está en el ciclo
+    DFS_visit(aristasDeCadaVerticeAGM, info, primero);
     if (info[primero].backEdges.size() != 1) {
-        cout << "Hay algo mal, el vertice deberia tener exactamente un back edge." << endl;
-        return 1;
+      cout << "Hay algo mal, el vertice deberia tener exactamente un back edge." << endl;
     }
     Arista backEdge = info[primero].backEdges.front();
     aristasAnillo.push_back(backEdge);
     aristasAGM.erase(backEdge);
     Vertice actual = backEdge.dameElOtroVertice(primero);
     while (actual != primero) {
-        aristasAGM.erase(info[actual].aristaAnterior); // En aristasAGM van a quedar las aristas fuera del circuito
-        aristasAnillo.push_back(info[actual].aristaAnterior); // Lo contrario para aristasAnillo
-        actual = info[actual].verticeAnterior;
+      aristasAGM.erase(info[actual].aristaAnterior);
+      aristasAnillo.push_back(info[actual].aristaAnterior);
+      actual = info[actual].verticeAnterior;
     }
-    cout << costoTotal << " " << aristasAnillo.size() << " " << aristasAGM.size() << endl;
-    for (auto it = aristasAnillo.begin(); it != aristasAnillo.end(); it++) {
-        cout << it->dameVerticeUno() + 1 << " " << it->dameVerticeDos() + 1 << endl;
-    }
-    for (auto it = aristasAGM.begin(); it != aristasAGM.end(); it++) {
-        cout << it->dameVerticeUno() + 1 << " " << it->dameVerticeDos() + 1 << endl;
-    }
-    
-    return 0;
-}
-\end{lstlisting}
-\subsubsection{Código del generador de grafos aleatorios}
-\lstset{language=C++,
-                keywordstyle=\color{blue},
-                stringstyle=\color{red},
-                commentstyle=\color{magenta},
-                morecomment=[l][\color{magenta}]{\#}
-}
-\begin{lstlisting}[frame=single]
-Vertice seleccionarVerticeRandom(set<Vertice> & conjunto) {
-    int i = rand() % conjunto.size();
-    auto it = conjunto.begin();
-    for(int j = 0; j < i; j++) it++;
-    return *it;
-}
-
-int main(int argc, const char* argv[]) {
-    srand(time(NULL) + getpid()); // Seedeo
-    for (int n = 1; n <= MAX_VERTICES; n++) {
-        for (int i = 1; i <= CANT_INSTANCIAS; i++) {
-            int m = rand() % (1 + n * (n - 1) / 2); // m es un valor aleatorio entre 0 y n(n-1)/2
-            cout << n << " " << m << endl;
-            set<Vertice> vertices; // Acá voy a tener el conjunto de vértices que todavía al menos una arista disponible.
-            for (int i = 0; i < n; i++) {
-                vertices.insert(i); // Los vertices van a ser enteros entre 0 y n-1, tengo que sumarles uno al imprimir
-            }
-            vector< set<Vertice> > vecinosPosibles(n);
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
-                    if (i != j) {
-                        vecinosPosibles[i].insert(j);
-                    }
-                }
-            }
-            while (m > 0) {
-                Vertice v = seleccionarVerticeRandom(vertices);
-                if (vecinosPosibles[v].size() == 0) {
-                    vertices.erase(v);
-                } else {
-                    m--;
-                    Vertice w = seleccionarVerticeRandom(vecinosPosibles[v]);
-                    vecinosPosibles[v].erase(w);
-                    vecinosPosibles[w].erase(v);
-                    cout << v + 1 << " " << w + 1 << " " << (rand() % 100) + 1 << endl;
-                }
-            }
-        }
-    }
-}
-\end{lstlisting}
-\subsubsection{Código del generador de grafos completos}
-\lstset{language=C++,
-                keywordstyle=\color{blue},
-                stringstyle=\color{red},
-                commentstyle=\color{magenta},
-                morecomment=[l][\color{magenta}]{\#}
-}
-\begin{lstlisting}[frame=single]
-int main(int argc, const char* argv[]) {
-    srand(time(NULL) + getpid()); // Seedeo
-    for (int n = 1; n <= MAX_VERTICES; n++) {
-        for (int i = 1; i <= CANT_INSTANCIAS; i++) {
-            int m = n * (n - 1) / 2;
-            cout << n << " " << m << endl;
-            for (int v = 1; v <= n; v++) {
-                for (int a = 1; a <= (n-1) - (v-1); a++) {
-                    cout << v << " " << (v + a) << " " << (rand() % 100) + 1 << endl;
-                }
-            }
-        }
-    }
-}
-\end{lstlisting}
-\subsubsection{Código del tester (sólo lo relevante, el resto es igual)}
-\lstset{language=C++,
-                keywordstyle=\color{blue},
-                stringstyle=\color{red},
-                commentstyle=\color{magenta},
-                morecomment=[l][\color{magenta}]{\#}
-}
-\begin{lstlisting}[frame=single]
-chrono::microseconds algoritmo(unsigned int n, unsigned int m, unsigned int costoTotal, vector< list<Arista> > aristasDeCadaVertice, vector< list<Arista> > aristasDeCadaVerticeAGM, set<Arista, comparacionArista> aristasGrafo, set<Vertice> verticesAGM, set<Arista, comparacionArista> aristasAGM, set<Arista, comparacionArista> aristasCandidatasAGM, list<Arista> aristasAnillo) 
-{
-    auto start_time = chrono::high_resolution_clock::now();
-    // Arranco poniendo el vértice 0 en verticesAGM, y sus aristas en aristasCandidatasAGM
-    verticesAGM.insert(0);
-    for(auto it = aristasDeCadaVertice[0].begin(); it != aristasDeCadaVertice[0].end(); it++) {
-        aristasCandidatasAGM.insert(*it);
-    }
-    
-    while (aristasAGM.size() < n - 1 && aristasCandidatasAGM.size() > 0 ) {
-        auto iterAristaMinima = aristasCandidatasAGM.begin();
-        Arista a = *iterAristaMinima;
-        aristasCandidatasAGM.erase(iterAristaMinima);           
-        pair<bool,Vertice> infoIncidencia = a.incideEnDosVertices(verticesAGM);
-        if (infoIncidencia.first) {                             
-            continue;
-        } else {
-            Vertice nuevo = infoIncidencia.second;              
-            verticesAGM.insert(nuevo);                          
-            aristasGrafo.erase(a);                              
-            aristasAGM.insert(a);                               
-            Vertice otro = a.dameElOtroVertice(nuevo);
-            aristasDeCadaVerticeAGM[nuevo].push_back(a);        
-            aristasDeCadaVerticeAGM[otro].push_back(a);
-            for(auto it = aristasDeCadaVertice[nuevo].begin(); it != aristasDeCadaVertice[nuevo].end(); it++) {
-                if (it->incideEnDosVertices(verticesAGM).first) {
-                    continue;                                   
-                }
-                aristasCandidatasAGM.insert(*it);
-            }
-        }
-    }
-    
-    if ( (aristasAGM.size() < n - 1) || (aristasGrafo.size() == 0)) {
-        // No hay solucion
-    } else {
-        Arista menor = *aristasGrafo.begin();
-        aristasAGM.insert(menor);
-        for (auto it = aristasAGM.begin(); it != aristasAGM.end(); it++) {
-            costoTotal += it->costo();
-        }
-        Vertice primero = menor.dameVerticeUno();
-        Vertice segundo = menor.dameVerticeDos();
-        aristasDeCadaVerticeAGM[primero].push_back(menor);
-        aristasDeCadaVerticeAGM[segundo].push_back(menor);
-        // Tengo que encontrar el circuito simple, esto es, el anillo
-        infoVerticeDFS info[n];
-        DFS_visit(aristasDeCadaVerticeAGM, info, primero);
-        if (info[primero].backEdges.size() != 1) {
-            cout << "Hay algo mal, el vertice deberia tener exactamente un back edge." << endl;
-        }
-        Arista backEdge = info[primero].backEdges.front();
-        aristasAnillo.push_back(backEdge);
-        aristasAGM.erase(backEdge);
-        Vertice actual = backEdge.dameElOtroVertice(primero);
-        while (actual != primero) {
-            aristasAGM.erase(info[actual].aristaAnterior);
-            aristasAnillo.push_back(info[actual].aristaAnterior);
-            actual = info[actual].verticeAnterior;
-        }
-    }
-    
-    auto end_time = chrono::high_resolution_clock::now();
-    chrono::microseconds tiempo = chrono::duration_cast<chrono::microseconds>(end_time - start_time);
-    return tiempo;
+  }
+  
+  auto end_time = chrono::high_resolution_clock::now();
+  chrono::microseconds tiempo = chrono::duration_cast<chrono::microseconds>(end_time - start_time);
+  return tiempo;
 }
 
 const int CANT_INSTANCIAS = 1000;
@@ -429,51 +713,51 @@ const int MAX_VERTICES = 100;
 const int CANT_REPETICIONES_CALCULO_INSTANCIA = 10;
 
 int main(int argc, const char* argv[]) {
-    for (int cantVertices = 1; cantVertices <= MAX_VERTICES; cantVertices++) {
-        int promedio = 0;
-        for (int instancia = 1; instancia <= CANT_INSTANCIAS; instancia++) {
-            unsigned int n, m, costoTotal = 0;
-            vector< list<Arista> > aristasDeCadaVertice;
-            vector< list<Arista> > aristasDeCadaVerticeAGM;
-            set<Arista, comparacionArista> aristasGrafo;
-            set<Vertice> verticesAGM;
-            set<Arista, comparacionArista> aristasAGM;
-            set<Arista, comparacionArista> aristasCandidatasAGM;
-            list<Arista> aristasAnillo;
-            
-            cin >> n >> m;
-            
-            for (unsigned int i = 0; i < n; i++) {
-                aristasDeCadaVertice.push_back(list<Arista>());
-                aristasDeCadaVerticeAGM.push_back(list<Arista>());
-            }
-            
-            for (unsigned int i = 0; i < m; i++) {
-                Vertice v1, v2;
-                int l;
-                cin >> v1 >> v2 >> l;
-                v1--; v2--;
-                Arista a(v1, v2, l);
-                aristasDeCadaVertice[v1].push_back(a);
-                aristasDeCadaVertice[v2].push_back(a);
-                aristasGrafo.insert(a);
-            }
-            
-            chrono::microseconds minTiempo(INT_MAX);
-            for (int rep = 1; rep <= CANT_REPETICIONES_CALCULO_INSTANCIA; rep++) {
-                // Notar que todo se pasa por copia para que no se modifique.
-                chrono::microseconds tiempoRep = algoritmo(n, m, costoTotal, aristasDeCadaVertice, aristasDeCadaVerticeAGM, aristasGrafo, verticesAGM,aristasAGM, aristasCandidatasAGM, aristasAnillo);
-                if (tiempoRep < minTiempo)
-                    minTiempo = tiempoRep;
-            }
-            
-            promedio += minTiempo.count();
-        }
-        promedio = promedio / CANT_INSTANCIAS;
-        cout << cantVertices << " " << promedio << endl;
+  for (int cantVertices = 1; cantVertices <= MAX_VERTICES; cantVertices++) {
+    int promedio = 0;
+    for (int instancia = 1; instancia <= CANT_INSTANCIAS; instancia++) {
+      unsigned int n, m, costoTotal = 0;
+      vector< list<Arista> > aristasDeCadaVertice;
+      vector< list<Arista> > aristasDeCadaVerticeAGM;
+      set<Arista, comparacionArista> aristasGrafo;
+      set<Vertice> verticesAGM;
+      set<Arista, comparacionArista> aristasAGM;
+      set<Arista, comparacionArista> aristasCandidatasAGM;
+      list<Arista> aristasAnillo;
+      
+      cin >> n >> m;
+      
+      for (unsigned int i = 0; i < n; i++) {
+        aristasDeCadaVertice.push_back(list<Arista>());
+        aristasDeCadaVerticeAGM.push_back(list<Arista>());
+      }
+      
+      for (unsigned int i = 0; i < m; i++) {
+        Vertice v1, v2;
+        int l;
+        cin >> v1 >> v2 >> l;
+        v1--; v2--;
+        Arista a(v1, v2, l);
+        aristasDeCadaVertice[v1].push_back(a);
+        aristasDeCadaVertice[v2].push_back(a);
+        aristasGrafo.insert(a);
+      }
+      
+      chrono::microseconds minTiempo(INT_MAX);
+      for (int rep = 1; rep <= CANT_REPETICIONES_CALCULO_INSTANCIA; rep++) {
+        // Notar que todo se pasa por copia para que no se modifique.
+        chrono::microseconds tiempoRep = algoritmo(n, m, costoTotal, aristasDeCadaVertice, aristasDeCadaVerticeAGM, aristasGrafo, verticesAGM,aristasAGM, aristasCandidatasAGM, aristasAnillo);
+        if (tiempoRep < minTiempo)
+          minTiempo = tiempoRep;
+      }
+      
+      promedio += minTiempo.count();
     }
-    
-    
-    return 0;
+    promedio = promedio / CANT_INSTANCIAS;
+    cout << cantVertices << " " << promedio << endl;
+  }
+  
+  
+  return 0;
 }
 \end{lstlisting}
