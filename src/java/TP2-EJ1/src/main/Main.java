@@ -21,7 +21,7 @@ public class Main {
 	 */
 	public static void main(String[] args) throws IOException {
 		Main main = new Main();
-		// main.runAlgo("vuelos");
+		main.runAlgo("vuelos");
 		// runAlgo("vuelos");
 	}
 
@@ -56,8 +56,7 @@ public class Main {
 		return builder.toString();
 	}
 
-	public Aeropuerto[] crearInstancia(String[] lines, String origen,
-			String destino) {
+	public Aeropuerto[] crearInstancia(String[] lines, String origen, String destino) {
 		Set<String> ciudades = new TreeSet<String>();
 		ciudades.add(origen);
 		ciudades.add(destino);
@@ -82,10 +81,8 @@ public class Main {
 		}
 		for (int j = 0; j < lines.length; j++) {
 			String[] values = lines[j].split(" ");
-			Vuelo vuelo = new Vuelo(aeropuertos[ids.get(values[0])],
-					aeropuertos[ids.get(values[1])],
-					Integer.valueOf(values[2]), Integer.valueOf(values[3]),
-					j + 1);
+			Vuelo vuelo = new Vuelo(aeropuertos[ids.get(values[0])], aeropuertos[ids.get(values[1])], Integer.valueOf(values[2]),
+					Integer.valueOf(values[3]), j + 1);
 			aeropuertos[ids.get(values[0])].agregarAvuelosQueSalen(vuelo);
 			aeropuertos[ids.get(values[1])].agregarAvuelosQueLlegan(vuelo);
 		}
