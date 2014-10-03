@@ -26,14 +26,15 @@ con las siguientes características:
 \end{displaymath}
 Este enunciado indica si una secuencia de vuelos en particular, no vacía, es un itinerario válido para nuestro problema.
 Haciendo abuso de notación diremos que una secuencia de vuelos $S$ está incluida en un conjuntos de vuelos $V$ y
-notaremos $S \subseteq V$ si todos los vuelos de la secuencia $S$ pertenecen al conjunto $V$
+notaremos $S \subseteq V$ si todos los vuelos de la secuencia $S$ pertenecen al conjunto $V$.
+
 Contando con todas estas definiciones podemos caracterizar a una solución $S$ del problema más formalmente de la siguiente
 manera:
 \begin{displaymath}
   (esItinerarioValido(S, a, b) \land S \subseteq V) \land 
 \end{displaymath}
 \begin{displaymath}
-  (\forall S' : esItinerarioValido(S', a, b) \land S \subseteq V) S^n_{aterrizaje} \leq S'^n_{aterrizaje}
+  (\forall S' : esItinerarioValido(S', a, b) \land S' \subseteq V) S^n_{aterrizaje} \leq S'^n_{aterrizaje}
 \end{displaymath}
 
 \subsection{Resolución}
@@ -56,7 +57,7 @@ v\'alida que nos lleva desde $c$ hasta la ciudad destino que queremos llegar.
 Solo nos va a interesar un vuelo $v$ tal que exista un itinerario v\'alido hasta tomarnos $v$ y que exista un 
 itinerario v\'alido hasta nuestra ciudad destino a partir de tomarnos $v$, esta noci\'on va a definir nuestro 
 conjunto de vuelos v\'alidos. Como se puede notar el enunciado de ExisteVuelo, está definido recursivamente.
-Dados un conjunto de vuelos $C$ y las ciudades $inicio$ y $destino$ podemos definir el conjunto de vuelod $validos$ como:
+Dados un conjunto de vuelos $C$ y las ciudades $inicio$ y $destino$ podemos definir el conjunto de vuelos v\'alidos como:
 \begin{align*}
 (\forall v:Vuelo, v \in Validos(C,inicio,destino)) \Leftrightarrow ((v.origen == inicio \;\vee \\
 (\exists v':Vuelo, v' \in Validos(C,inicio,destino) / v'.destino == v.origen \wedge v'.aterrizaje + 2 \leq\\ v.despegue)) \wedge ExisteVuelo(C,v.destino,destino,v.aterrizaje) \wedge v \in C)
@@ -306,7 +307,7 @@ Entonces para cualquier recursi\'on, se chequean a lo sumo todos los vuelos de c
 
 Todos los vuelos de cada ciudad son exactamente N vuelos.
 
-Cuando se genera una llamada recursiva se colorea el vuelo, por lo tanto ese vuelo nunca mas va a ser llamado recursivamente ya que se conoce el estado para cualquer instante de tiempo.
+Cuando se genera una llamada recursiva se colorea el vuelo, por lo tanto ese vuelo nunca m\'as va a ser llamado recursivamente ya que se conoce el estado para cualquer instante de tiempo.
 
 Entonces el algoritmo puedo tener tantas llamadas recursivas como vuelos distintos tenga.
 
@@ -406,9 +407,10 @@ Si se divide la muestra por $N$ deber\'ia quedar una recta como se observa en el
 	\end{minipage}	
 \end{figure}
 
+\newpage
 \subsubsection{Test de generaci\'on de casos pseudo aleatorios}
 
-Se genero instancias pseudo-aleatorias de entrada para el algoritmo.
+Se gener\'o instancias pseudo-aleatorias de entrada para el algoritmo.
 
 La pseudo-aleatoridad se basaba en generar $N$ vuelos aleatorios, es decir vuelos donde el punto de partida y el de aterrizaje sean un elemento al azar, distintos dentro de un conjunto acotada de ciudades.
 
@@ -444,3 +446,11 @@ Se obtuvo el siguiente gr\'afico:
 
 
 Como se puede apreciar en el gr\'afico, para toda instancia aleatoria el T que obtuvimos fue menor al del peor caso.
+
+\subsection{Compilaci\'on y corrida}
+
+Hay dos clases main que se pueden correr para llamar a nuestro algoritmo, una para cargar los datos de vuelos en un archivo y otra para cargarlos desde consola.
+
+Si se quiere cargar los datos en un archivo y luego llamar al algoritmo la clase la cual debemos correr es Main y deber\'iamos completar el archivo "vuelos.txt" que se encuentra en el directorio base del proyecto.
+
+Si se quiere cargar los datos en por consola y luego llamar al algoritmo la clase la cual debemos correr es MainFromConsole.
