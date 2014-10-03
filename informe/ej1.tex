@@ -220,46 +220,14 @@ Implementada sobre un trie o sobre un hashmap, para el diccionario de ids me dar
 Nuestra implementaci\'on usa un treeset, asi que la complejidad de crear nuestros aeropuertos es O(n.log(n))
 
 
-\begin{comment}
-
 \subsection{Demostración de correctitud}
-
-Para obtener el conjunto de vuelos v\'alidos vamos a implementar una funci\'on recursiva que itere por los vuelos que salen desde la ciudad inicial hasta la ciudad final, los siguientes enunciados son importantes para entender en que se basa el algoritmo.
-
-Dados, $vuelos$:conj(Vuelo), una ciudad $C$, $inicio$:Ciudad y $destino$:Ciudad
-
-Corolario 1:
-
-\begin{align*}
-(ExisteVuelo(vuelos,inicio, C, 0) \wedge (\exists v:Vuelo, v \in Validos(vuelos,inicio,C))\\
-(v.destino == C \wedge ExisteVuelo(vuelos,C, destino, v.aterrizaje))) \implies \\ ExisteVuelo(vuelos,inicio, destino, 0)
-\end{align*}
-Corolario 2:
-
-\begin{align*}
-(\forall C':Ciudad / \exists v:Vuelo, v.inicio == C' \wedge v.destino == C)\\
-(ExisteVuelo(vuelos,C,destino,v.aterrizaje) \implies \\
-ExisteVuelo(vuelos,C',destino,v.despegue) \wedge v \in Validos(vuelos,C',destino)
-\end{align*}
-\begin{align*}
-\end{align*}
-
-
-Corolario 3:
-
-Sea v:Vuelo tal que:
-\begin{align*}
-v.destino == C \wedge v \in Validos(vuelos,C,destino) \wedge\\
-(\forall v':Vuelo, v' \in Validos(vuelos,C,destino)(v.aterrizaje \geq v'.aterrizaje))\\
-\end{align*}
-Entonces:
-\begin{align*}
-(\forall C':Ciudad / \exists w:Vuelo, w.inicio == C' \wedge w.destino == C)\\
-w.aterizaje + 2 \leq v.despegue \implies w \in Validos(vuelos,C',destino) 
-\end{align*}
-
-\end{comment}
-
+La demostración de correctitud la dividiremos en 2 partes:
+\begin{enumerate}
+	\item ver que la función \textit{existeVuelo} efectivamente calcula todos los itinerarios válidos
+	\item contando con los itinerarios válidos nuestro procedimiento para obtener el primero que llega es correcto
+\end{enumerate}
+La función \textit{existeVuelo} es llamada con nuestro origen como origen y con nuestro destino como destino.
+Cualquier itinerario válido necesariamente tiene que empezar con un 
 
 \subsection{Análisis de complejidad}
 Nuestra implementaci\'on consta de tres partes:
