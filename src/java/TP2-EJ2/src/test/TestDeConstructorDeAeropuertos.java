@@ -25,42 +25,37 @@ public class TestDeConstructorDeAeropuertos {
 	}
 
 	public void testRandomAeropuertos() {
-		for (int j = 10000; j < 100000; j += 500) {
+		for (int j = 500; j < 100000; j += 500) {
 			int vuelos = j;
 			int ciudades = vuelos / 20;
 			String[] strings = new String[vuelos];
 			List<Integer> set = new LinkedList<Integer>();
-			for (int k = 0; k < 3; k++) {
-				for (int i = 0; i < strings.length; i++) {
-					int inicio = random.nextInt(ciudades);
-					set.add(inicio);
-					int destino = random.nextInt(ciudades);
-					set.add(destino);
-					int llegada = random.nextInt(maxHora - 1) + 1;
-					int despegue = random.nextInt(llegada);
-					strings[i] = inicio + " " + destino + " " + despegue + " "
-							+ llegada;
-				}
-				String origen = String.valueOf(set.get(random.nextInt(set
-						.size())));
-				String destino = String.valueOf(set.get(random.nextInt(set
-						.size())));
-				while (destino.equals(origen)) {
-					destino = String
-							.valueOf(set.get(random.nextInt(set.size())));
-				}
-				Long min = null;
-				for (int i = 0; i < 20; i++) {
-					Long antes = new Date().getTime();
-					Aeropuerto[] aeropuertos = main.crearInstancia(strings,
-							origen, destino);
-					Long dps = new Date().getTime();
-					Aterrizar.mejorVuelo(aeropuertos);
-					min = min == null || min > (dps - antes) ? dps - antes
-							: min;
-				}
-				System.out.println(j + " " + min);
+			for (int i = 0; i < strings.length; i++) {
+				int inicio = random.nextInt(ciudades);
+				set.add(inicio);
+				int destino = random.nextInt(ciudades);
+				set.add(destino);
+				int llegada = random.nextInt(maxHora - 1) + 1;
+				int despegue = random.nextInt(llegada);
+				strings[i] = inicio + " " + destino + " " + despegue + " "
+						+ llegada;
 			}
+			String origen = String.valueOf(set.get(random.nextInt(set.size())));
+			String destino = String
+					.valueOf(set.get(random.nextInt(set.size())));
+			while (destino.equals(origen)) {
+				destino = String.valueOf(set.get(random.nextInt(set.size())));
+			}
+			Long min = null;
+			for (int i = 0; i < 10; i++) {
+				Long antes = new Date().getTime();
+				Aeropuerto[] aeropuertos = main.crearInstancia(strings, origen,
+						destino);
+				Long dps = new Date().getTime();
+				Aterrizar.mejorVuelo(aeropuertos);
+				min = min == null || min > (dps - antes) ? dps - antes : min;
+			}
+			System.out.println(j + "," + min + "," + min * 100000 / j);
 		}
 	}
 }

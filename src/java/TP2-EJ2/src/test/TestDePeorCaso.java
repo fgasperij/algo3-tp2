@@ -58,7 +58,7 @@ public class TestDePeorCaso extends AbstractTestCase {
 				}
 				assert (sol.equals("no"));
 			}
-			System.out.println(vuelos + "," + prom);
+			System.out.println(vuelos + "," + prom + "," + (prom*1000/vuelos) );
 		}
 
 	}
