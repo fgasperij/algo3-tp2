@@ -416,13 +416,10 @@ La pseudo-aleatoridad se basaba en generar $N$ vuelos aleatorios, es decir vuelo
 
 Tomamos la cota para la cantidad de ciudades como $\frac{N}{20}$. Esta cota se da para obtener instancias relativamente reales, y no es las cuales haya muchos vuelos que el algoritmo nunca recorra (estos casos deber\'ian tener un tiempo relativamente menor para obtener una soluci\'on).
 
-Para cada $N$: nº de vuelos se generan $k'$ instancias, con $k' = 3$.
+Se llamó al algoritmo $k$ veces, con $k=20$, y de esas corridas se eligió la de menor tiempo de ejecución.
 
-Se llamó al algoritmo $k$ veces, con $k=20$, y de esas corridas se eligió el de menor tiempo de ejecución.
+Para $N$ moviendose entre 500 y 40000, y $k$ cantidad de corridas $k=10$, se obtuvo el siguiente gr\'afico.
 
-Se sumó el tiempo de las $k'$ corridas.
-
-Para $N$ moviendose entre 500 y 40000, y $k$ cantidad de corridas $k=7$ y $k'=3$, se obtuvo el siguiente gr\'afico.
 
 \begin{figure}[H]
 	\begin{minipage}[t]{\linewidth}
